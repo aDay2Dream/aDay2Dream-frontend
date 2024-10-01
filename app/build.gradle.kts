@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.aday2dream"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.aday2dream"
@@ -68,4 +68,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.material)
+
 }

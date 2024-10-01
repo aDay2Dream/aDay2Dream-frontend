@@ -21,14 +21,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ADay2DreamTheme {
-                aDay2DreamApp()
+                ADay2DreamApp()
             }
                 }
             }
         }
 
 @Composable
-fun aDay2DreamApp(){
+fun ADay2DreamApp(){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginPage(navController) }
