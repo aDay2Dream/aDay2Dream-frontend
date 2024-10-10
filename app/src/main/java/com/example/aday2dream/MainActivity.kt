@@ -1,5 +1,6 @@
 package com.example.aday2dream
 
+import android.annotation.SuppressLint
 import androidx.navigation.compose.NavHost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -27,6 +28,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+@SuppressLint("ComposableDestinationInComposeScope")
 @Composable
 fun ADay2DreamApp(){
     val navController = rememberNavController()
@@ -34,7 +36,9 @@ fun ADay2DreamApp(){
         composable("login") { LoginPage(navController) }
         composable("home") { HomePage(navController)}
         composable("post") {PostPage(navController)}
-        composable("register") { RegisterPage(navController)}
+        composable("register") { RegisterPage(navController)
+        composable("account") {AccountPage(navController)}
+        }
     }
 }
 

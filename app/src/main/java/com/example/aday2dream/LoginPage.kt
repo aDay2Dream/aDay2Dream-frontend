@@ -1,6 +1,7 @@
 package com.example.aday2dream
 
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.widget.LinearLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Magenta
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -56,7 +58,7 @@ fun LoginPage(navController: NavController) {
             Button(onClick = {
                 navController.navigate("home")
             }) {
-                Text("Log in");
+                Text(stringResource(R.string.login_button_text));
             }
             CheckboxSignUp()
             RegisterTextButton(navController)
@@ -75,7 +77,7 @@ fun TextFieldUsername() {
         modifier = Modifier.clip(RoundedCornerShape(15.dp)),
         value = username,
         onValueChange = { username = it },
-        label = { Text("Username") }
+        label = { Text(stringResource(R.string.username)) }
     )
 }
 
@@ -88,7 +90,7 @@ fun TextFieldPassword() {
         modifier = Modifier.clip(RoundedCornerShape(15.dp)),
         value = password,
         onValueChange = { password = it },
-        label = { Text("Password")},
+        label = { stringResource(R.string.password) },
         visualTransformation = PasswordVisualTransformation()
     )
 }
@@ -98,12 +100,14 @@ fun TextFieldPassword() {
 fun RegisterTextButton(navController: NavController)
 {
     Row(){
-        Text("Don't have an account? ")
+        Text(
+            stringResource(R.string.no_account)
+        )
         Text(
             modifier = Modifier.clickable{
                 navController.navigate("register")
             },
-            text = "Register now",
+            text = stringResource(R.string.register_button_text),
             color = Color.Magenta
         )
     }
@@ -120,6 +124,6 @@ fun CheckboxSignUp() {
             checked = checked,
             onCheckedChange = { checked = it }
         )
-        Text("Keep me signed in")
+        Text(stringResource(R.string.register_button_text))
     }
 }
