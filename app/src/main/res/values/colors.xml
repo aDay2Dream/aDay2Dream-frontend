@@ -11,5 +11,6 @@
     <color name="purple_secondary">#7E60BF</color>
     <color name="pink_main">#E4B1F0</color>
     <color name="pink_secondary">#FFE1FF</color>
+    <color name="pink_third">#FFF1FF</color>
 
 </resources>

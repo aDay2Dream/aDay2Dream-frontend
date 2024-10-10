@@ -8,5 +8,6 @@
     <string name="last_name">Last Name</string>
     <string name="email">E-mail</string>
     <string name="keep_me_signed_in">Keep me signed in</string>
-    <string name="no_account">Don\'t have an account?</string>
+    <string name="no_account">Don\'t have an account? </string>
+    <string name="logo_content_description">aDay2Dream</string>
 </resources>

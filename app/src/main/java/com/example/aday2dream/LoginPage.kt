@@ -3,6 +3,7 @@ package com.example.aday2dream
 import android.annotation.SuppressLint
 import android.content.res.Resources
 import android.widget.LinearLayout
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -32,9 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Magenta
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.NavController
@@ -42,7 +48,7 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun LoginPage(navController: NavController) {
-    Scaffold(){
+    Scaffold(Modifier.background(colorResource(R.color.pink_secondary))){
             innerPadding ->
         Column(
             modifier = Modifier
@@ -51,11 +57,12 @@ fun LoginPage(navController: NavController) {
             verticalArrangement = Arrangement.Center
         )
         {
-            Text("aDay2Dream")
-           // Spacer(Modifier.width(20.dp))
+            Image(modifier = Modifier.size(150.dp, 150.dp), painter = painterResource(R.drawable.logo), contentDescription = stringResource(id = R.string.logo_content_description))
+            Spacer(Modifier.height(20.dp))
             TextFieldUsername()
             TextFieldPassword()
-            Button(onClick = {
+            Spacer(Modifier.height(20.dp))
+            Button(modifier = Modifier.size(100.dp, 50.dp), onClick = {
                 navController.navigate("home")
             }) {
                 Text(stringResource(R.string.login_button_text));
@@ -71,8 +78,7 @@ fun LoginPage(navController: NavController) {
 @Composable
 fun TextFieldUsername() {
     var username by remember { mutableStateOf("") }
-
-    Spacer(modifier = Modifier.width(10.dp))
+    
     OutlinedTextField(
         modifier = Modifier.clip(RoundedCornerShape(15.dp)),
         value = username,
@@ -90,7 +96,7 @@ fun TextFieldPassword() {
         modifier = Modifier.clip(RoundedCornerShape(15.dp)),
         value = password,
         onValueChange = { password = it },
-        label = { stringResource(R.string.password) },
+        label = { Text(stringResource(R.string.password))},
         visualTransformation = PasswordVisualTransformation()
     )
 }
@@ -108,7 +114,7 @@ fun RegisterTextButton(navController: NavController)
                 navController.navigate("register")
             },
             text = stringResource(R.string.register_button_text),
-            color = Color.Magenta
+            color = colorResource(R.color.purple_secondary)
         )
     }
 }
@@ -124,6 +130,6 @@ fun CheckboxSignUp() {
             checked = checked,
             onCheckedChange = { checked = it }
         )
-        Text(stringResource(R.string.register_button_text))
+        Text(stringResource(R.string.keep_me_signed_in))
     }
 }
