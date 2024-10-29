@@ -41,6 +41,7 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterPage(navController: NavController) {
+    var credentials by remember { mutableStateOf(Credentials()) }
     Scaffold(topBar = {
         TopAppBar(
             modifier = Modifier.clip(
@@ -76,8 +77,17 @@ fun RegisterPage(navController: NavController) {
                 TextFieldLastName()
             }
             TextFieldEmail()
-            TextFieldUsername()
-            TextFieldPassword()
+            LoginField(
+                value = credentials.username,
+                onChange = { data -> credentials = credentials.copy(username = data) },
+                modifier = Modifier.width(150.dp)
+            )
+            PasswordField(
+                value = credentials.password,
+                onChange = {data -> credentials = credentials.copy(username = data)},
+                modifier = Modifier.width(150.dp)
+            )
+
             Button(onClick = {
                 navController.navigate("home")
             }) {

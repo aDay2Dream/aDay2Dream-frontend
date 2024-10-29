@@ -10,4 +10,6 @@
     <string name="keep_me_signed_in">Keep me signed in</string>
     <string name="no_account">Don\'t have an account? </string>
     <string name="logo_content_description">aDay2Dream</string>
+    <string name="title_post">Title</string>
+    <string name="description_post">Description</string>
 </resources>

@@ -38,6 +38,7 @@ fun ADay2DreamApp(){
         composable("post") {PostPage(navController)}
         composable("register") { RegisterPage(navController)
         composable("account") {AccountPage(navController)}
+            composable("add_page") {AddPostPage(navController) }
         }
     }
 }
