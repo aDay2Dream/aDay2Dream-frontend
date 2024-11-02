@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,6 +63,7 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun LoginPage(navController: NavController) {
+    var scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -104,7 +107,13 @@ fun LoginPage(navController: NavController) {
             }) {
                 Text(stringResource(R.string.login_button_text));
             }
-            CheckboxSignUp()
+            /*
+            LabeledCheckbox(
+                label = "Remember me",
+                onCheckChanged = { credentials = credentials.copy(remember = !credentials.remember) },
+                isChecked = credentials.remember
+            )
+             */
             RegisterTextButton(navController)
         }
     }
@@ -184,16 +193,21 @@ fun RegisterTextButton(navController: NavController)
 }
 
 @Composable
-fun CheckboxSignUp() {
-    var checked by remember { mutableStateOf(false) }
+fun LabeledCheckbox(
+    label: String,
+    onCheckChanged: () -> Unit,
+    isChecked: Boolean
+) {
 
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        Modifier
+            .clickable(
+                onClick = onCheckChanged
+            )
+            .padding(4.dp)
     ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = { checked = it }
-        )
-        Text(stringResource(R.string.keep_me_signed_in))
+        Checkbox(checked = isChecked, onCheckedChange = null)
+        Spacer(Modifier.size(6.dp))
+        Text(label)
     }
 }

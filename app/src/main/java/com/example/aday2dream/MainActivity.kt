@@ -35,11 +35,11 @@ fun ADay2DreamApp(){
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginPage(navController) }
         composable("home") { HomePage(navController)}
-        composable("post") {PostPage(navController)}
-        composable("register") { RegisterPage(navController)
-        composable("account") {AccountPage(navController)}
-            composable("add_page") {AddPostPage(navController) }
+        composable("post") { PostPage(navController) }
+        composable("register") { RegisterPage(navController) }
+        composable("account") { AccountPage(navController) }
+            composable("addpost") { AddPostPage(navController) }
         }
     }
-}
+
 
