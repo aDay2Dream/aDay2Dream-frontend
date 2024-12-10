@@ -58,12 +58,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.Navigator
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
+@SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPostPage(navController: NavController)
 {
-    var post by remember { mutableStateOf(Post()) }
+    var post by remember { mutableStateOf(Post(createdAt = LocalDateTime.now())) }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 

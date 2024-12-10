@@ -70,5 +70,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.material)
+    implementation("com.google.code.gson:gson:2.11.0")
+
 
 }
