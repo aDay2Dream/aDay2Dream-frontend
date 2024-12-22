@@ -8,25 +8,16 @@ import java.time.temporal.ChronoUnit
 data class Task(
     var post: Post,
     var startDate: LocalDateTime,
-    var deadlineDays: Int,
-    var deadlineWeeks: Int,
-    var deadlineMonths: Int,
+    var endDate: LocalDateTime,
     var timeLeft: Int = 0
 ) {
     @SuppressLint("NewApi")
     fun calculateTimeLeft() {
-
-        val deadlineDate = startDate
-            .plusDays(deadlineDays.toLong())
-            .plusWeeks(deadlineWeeks.toLong())
-            .plusMonths(deadlineMonths.toLong())
-
-
         val now = LocalDateTime.now()
-        timeLeft = if (now.isBefore(deadlineDate)) {
-            ChronoUnit.DAYS.between(now, deadlineDate).toInt()
+        timeLeft = if (now.isBefore(endDate)) {
+            ChronoUnit.DAYS.between(now, endDate).toInt()
         } else {
-            0 
+            0
         }
     }
 

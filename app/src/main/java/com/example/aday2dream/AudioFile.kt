@@ -1,7 +1,6 @@
 package com.example.aday2dream
 
 import android.net.Uri
-import java.io.File
 
 data class Audio (
     val uri: Uri,

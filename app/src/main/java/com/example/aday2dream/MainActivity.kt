@@ -6,23 +6,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.*
 import com.example.aday2dream.ui.theme.ADay2DreamTheme
 
 class MainActivity : ComponentActivity() {
+    public val viewModel: AccountViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ADay2DreamTheme {
-                ADay2DreamApp()
+                ADay2DreamApp(viewModel = viewModel)
             }
                 }
             }
@@ -30,13 +26,13 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("ComposableDestinationInComposeScope")
 @Composable
-fun ADay2DreamApp(){
+fun ADay2DreamApp(viewModel: AccountViewModel){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "login") {
-        composable("login") { LoginPage(navController) }
+        composable("login") { LoginPage(navController, viewModel = viewModel) }
         composable("home") { HomePage(navController)}
         composable("post") { PostPage(navController) }
-        composable("register") { RegisterPage(navController) }
+        composable("register") { RegisterPage(navController, viewModel = viewModel) }
         composable("account") { AccountPage(navController) }
             composable("addpost") { AddPostPage(navController) }
         }

@@ -26,7 +26,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.PackageManagerCompat.UnusedAppRestrictionsStatus
 import androidx.navigation.NavController
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -85,6 +84,13 @@ fun AccountPage(navController: NavController) {
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center)
         {
+            Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically)
+            {
+                // profile picture
+            }
+            Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically){
+
+            }
 
         }
 
