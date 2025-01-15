@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.aday2dream.data.Post
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 

@@ -1,6 +1,7 @@
-package com.example.aday2dream
+package com.example.aday2dream.presentation.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,7 +45,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
+import com.example.aday2dream.AccountLoginDto
+import com.example.aday2dream.AccountViewModel
+import com.example.aday2dream.LoginRequest
+import com.example.aday2dream.R
+import com.example.aday2dream.RetrofitClient
 
 @Composable
 fun LoginPage(navController: NavController, viewModel: AccountViewModel) {
@@ -53,8 +58,10 @@ fun LoginPage(navController: NavController, viewModel: AccountViewModel) {
     var scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var errorMessage by remember { mutableStateOf("") }
 
-    var account by remember { mutableStateOf(Account()) }
+
+    var account by remember { mutableStateOf(AccountLoginDto()) }
     Scaffold(snackbarHost = {
         SnackbarHost(hostState = snackbarHostState)
     },
@@ -62,7 +69,8 @@ fun LoginPage(navController: NavController, viewModel: AccountViewModel) {
             innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding).fillMaxSize(),
+                .padding(innerPadding)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         )
@@ -82,22 +90,20 @@ fun LoginPage(navController: NavController, viewModel: AccountViewModel) {
             )
             Spacer(Modifier.height(20.dp))
             Button(modifier = Modifier.size(100.dp, 50.dp), onClick = {
-                viewModel.login(account.username,account.password) { result ->
-                    message = result
-
-                    if (result?.contains("successful") == true) {
-
-                        navController.navigate("home")
-                    }
-                    else {
-                        scope.launch {
-                            if (result != null) {
-                                snackbarHostState.showSnackbar(result)
-                            }
-                        }
+                viewModel.login(
+                    accountLoginDto = AccountLoginDto(username = account.username, password = account.password)
+                ) { error, token ->
+                    if (error != null) {
+                        errorMessage = error
+                        Log.d("Login Button", errorMessage)
+                    } else if (token != null) {
+                        viewModel.saveAuthToken(token)
+                        Log.d("Login Button", "Token Saved")// Save the token
+                        navController.navigate("home") // Navigate to the profile page
                     }
                 }
-            }) {
+            })
+            {
                 Text(stringResource(R.string.login_button_text));
             }
             /*

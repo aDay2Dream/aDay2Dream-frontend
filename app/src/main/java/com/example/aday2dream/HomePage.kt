@@ -37,12 +37,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
-
+import com.example.aday2dream.data.Post
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePage(navController: NavController)
+fun HomePage(navController: NavController, viewModel: AccountViewModel)
 {
     val scrollState = rememberScrollState()
     Scaffold( modifier = Modifier.background(colorResource(R.color.pink_secondary)),
