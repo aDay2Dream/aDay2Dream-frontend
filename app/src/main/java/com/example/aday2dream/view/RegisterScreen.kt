@@ -1,5 +1,6 @@
-package com.example.aday2dream
+package com.example.aday2dream.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -29,12 +32,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
+import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.R
+import com.example.aday2dream.model.Account
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +53,7 @@ fun RegisterPage(navController: NavController, viewModel: AccountViewModel) {
     var registrationMessage by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var errorMessage = remember { mutableStateOf("") }
 
     Scaffold(snackbarHost = {
         SnackbarHost(hostState = snackbarHostState)
@@ -79,10 +89,23 @@ fun RegisterPage(navController: NavController, viewModel: AccountViewModel) {
         ) {
             Row()
             {
-                TextFieldFirstName()
-                TextFieldLastName()
+                NameField(
+                    value = account.firstName,
+                    onChange = { data -> account = account.copy(firstName = data) },
+                    modifier = Modifier.width(150.dp)
+                )
+                NameField(
+                    value = account.lastName,
+                    onChange = { data -> account = account.copy(lastName = data) },
+                    modifier = Modifier.width(150.dp)
+                )
             }
-            TextFieldEmail()
+            NameField(
+                value = account.email,
+                onChange = { data -> account = account.copy(email = data) },
+                modifier = Modifier.width(150.dp)
+            )
+
             LoginField(
                 value = account.username,
                 onChange = { data -> account = account.copy(username = data) },
@@ -96,21 +119,18 @@ fun RegisterPage(navController: NavController, viewModel: AccountViewModel) {
 
             Button(
                 onClick = {
-                    isLoading = true
-                    viewModel.register(account.username,account.password, account.email,account.firstName,account.lastName) { message ->
-                        isLoading = false
-                        registrationMessage = message
-                        if (registrationMessage.contains("successful")) {
-
-                            navController.navigate("home")
-                        }
-                        else {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(registrationMessage)
-                            }
-                        }
+                    viewModel.register(
+                        username = account.username,
+                        password = account.password,
+                        email = account.email,
+                        firstName = account.firstName,
+                        lastName = account.lastName
+                    ) { error ->
+                        error?.let { Log.e("Registration", it) }
                     }
-            }) {
+                    navController.navigate("login")
+                })
+             {
                 Text(stringResource(R.string.register_button_text));
             }
         }
@@ -122,13 +142,7 @@ fun TextFieldFirstName()
 {
     var firstName by remember { mutableStateOf("") }
 
-    OutlinedTextField(
-        modifier = Modifier.clip(RoundedCornerShape(15.dp)).width(142.dp),
-        value = firstName,
-        onValueChange = { firstName = it },
-        label = { Text("First Name") }
-    )
-    Spacer(Modifier.width(10.dp))
+
 }
 
 @Composable
@@ -158,4 +172,32 @@ fun TextFieldLastName()
         label = { Text("Last Name") }
     )
 }
+
+@Composable
+fun NameField(
+    value: String,
+    onChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String = stringResource(R.string.username),
+) {
+
+    val focusManager = LocalFocusManager.current
+
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        modifier = modifier,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+        ),
+        label = { Text(label) },
+        singleLine = true,
+        visualTransformation = VisualTransformation.None
+    )
+}
+
+
+
 

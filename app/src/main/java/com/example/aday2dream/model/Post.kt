@@ -1,4 +1,4 @@
-package com.example.aday2dream
+package com.example.aday2dream.data
 
 import android.annotation.SuppressLint
 import com.google.gson.Gson

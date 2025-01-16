@@ -1,4 +1,4 @@
-package com.example.aday2dream
+package com.example.aday2dream.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -43,6 +43,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.aday2dream.R
+import com.example.aday2dream.model.Post
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 

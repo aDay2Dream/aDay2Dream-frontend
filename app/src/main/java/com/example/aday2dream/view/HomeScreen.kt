@@ -1,4 +1,4 @@
-package com.example.aday2dream
+package com.example.aday2dream.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,12 +37,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
-
+import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.R
+import com.example.aday2dream.model.Post
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePage(navController: NavController)
+fun HomePage(navController: NavController, viewModel: AccountViewModel)
 {
     val scrollState = rememberScrollState()
     Scaffold( modifier = Modifier.background(colorResource(R.color.pink_secondary)),
@@ -71,7 +73,9 @@ fun HomePage(navController: NavController)
 
          */
         bottomBar = {
-            BottomAppBar(modifier = Modifier.height(120.dp).clip(RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)).border(width = 2.dp, color = colorResource(R.color.purple_main), shape = RoundedCornerShape(20.dp)),
+            BottomAppBar(modifier = Modifier.height(120.dp).clip(RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)).border(width = 2.dp, color = colorResource(
+                R.color.purple_main
+            ), shape = RoundedCornerShape(20.dp)),
                 containerColor = colorResource(R.color.pink_secondary)
             ) {
                 Row(modifier = Modifier.fillMaxWidth(),
@@ -79,7 +83,9 @@ fun HomePage(navController: NavController)
                     horizontalArrangement = Arrangement.SpaceEvenly) {
                     IconButton(onClick = {}) {
                         Icon(
-                            imageVector = Icons.Default.Search, contentDescription = "account", tint = colorResource(R.color.purple_main)
+                            imageVector = Icons.Default.Search, contentDescription = "account", tint = colorResource(
+                                R.color.purple_main
+                            )
                         )
                     }
                     FloatingActionButton(
@@ -95,7 +101,9 @@ fun HomePage(navController: NavController)
                         navController.navigate("account")
                     }) {
                         Icon(
-                            imageVector = Icons.Default.AccountCircle, contentDescription = "account", tint = colorResource(R.color.purple_main)
+                            imageVector = Icons.Default.AccountCircle, contentDescription = "account", tint = colorResource(
+                                R.color.purple_main
+                            )
                         )
                     }
                 }

@@ -9,7 +9,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.*
+import com.example.aday2dream.presentation.ui.LoginPage
 import com.example.aday2dream.ui.theme.ADay2DreamTheme
+
 
 class MainActivity : ComponentActivity() {
     public val viewModel: AccountViewModel by viewModels()
@@ -30,7 +32,7 @@ fun ADay2DreamApp(viewModel: AccountViewModel){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginPage(navController, viewModel = viewModel) }
-        composable("home") { HomePage(navController)}
+        composable("home") { HomePage(navController, viewModel = viewModel)}
         composable("post") { PostPage(navController) }
         composable("register") { RegisterPage(navController, viewModel = viewModel) }
         composable("account") { AccountPage(navController) }

@@ -1,4 +1,4 @@
-package com.example.aday2dream
+package com.example.aday2dream.view
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
