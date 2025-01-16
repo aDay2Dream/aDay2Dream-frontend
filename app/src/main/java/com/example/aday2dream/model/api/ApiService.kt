@@ -1,6 +1,6 @@
 package com.example.aday2dream
 
-import com.example.aday2dream.data.Account
+import com.example.aday2dream.model.Account
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

@@ -1,4 +1,4 @@
-package com.example.aday2dream
+package com.example.aday2dream.view
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -41,10 +41,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.aday2dream.data.Account
-import com.example.aday2dream.presentation.ui.LoginField
-import com.example.aday2dream.presentation.ui.PasswordField
-import kotlinx.coroutines.launch
+import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.R
+import com.example.aday2dream.model.Account
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

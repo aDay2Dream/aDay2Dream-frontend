@@ -1,4 +1,4 @@
-package com.example.aday2dream.presentation.ui
+package com.example.aday2dream.view
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -27,6 +28,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -45,21 +49,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.aday2dream.AccountLoginDto
-import com.example.aday2dream.AccountViewModel
-import com.example.aday2dream.LoginRequest
+import com.example.aday2dream.model.dto.AccountLoginDto
+import com.example.aday2dream.viewmodel.AccountViewModel
 import com.example.aday2dream.R
-import com.example.aday2dream.RetrofitClient
+import com.example.aday2dream.viewmodel.LoginState
 
 @Composable
-fun LoginPage(navController: NavController, viewModel: AccountViewModel) {
+fun LoginPage(navController: NavController, viewModel: AccountViewModel, onLoginSuccess: () -> Unit) {
 
     var message by remember { mutableStateOf<String?>(null) }
     var scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var errorMessage by remember { mutableStateOf("") }
-
+    val loginState by viewModel.loginState.collectAsState()
 
     var account by remember { mutableStateOf(AccountLoginDto()) }
     Scaffold(snackbarHost = {
@@ -114,6 +117,17 @@ fun LoginPage(navController: NavController, viewModel: AccountViewModel) {
             )
              */
             RegisterTextButton(navController)
+
+            when (loginState) {
+                is LoginState.Loading -> CircularProgressIndicator()
+                is LoginState.Success -> {
+                    Text("Login Successful!")
+                    LaunchedEffect(Unit) { onLoginSuccess() }
+                }
+                is LoginState.Error -> Text((loginState as LoginState.Error).message, color = Color.Red)
+                else -> {}
+            }
+
         }
     }
 }
