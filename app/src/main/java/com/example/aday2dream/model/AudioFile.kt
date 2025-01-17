@@ -1,12 +1,10 @@
-package com.example.aday2dream
+package com.example.aday2dream.model
 
 import android.net.Uri
 
-data class Audio (
-    val uri: Uri,
-    val displayName: String,
-    val id: Int,
-    val data: String,
+data class AudioFile (
+    val id: Long,
+    val uri: String,
+    val title: String,
     val duration: Int,
-    val title: String
 )

@@ -1,6 +1,14 @@
-package com.example.aday2dream
+package com.example.aday2dream.model.api
 
+import com.example.aday2dream.model.dto.AccountLoginDto
 import com.example.aday2dream.model.Account
+import com.example.aday2dream.model.AudioFile
+import com.example.aday2dream.model.Post
+import com.example.aday2dream.model.dto.AccountDto
+import com.example.aday2dream.model.dto.AudioFileDto
+import com.example.aday2dream.model.dto.PostDto
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -34,11 +42,10 @@ data class PostResponse(
         val description: String,
         val price: Double,
         val publisher: Account,
-        val audiofile: Audiofile
+        val audiofile: AudioFile
 )
 
-data class Account(val username: String)
-data class Audiofile(val title: String, val uri: String)
+
 
 interface ApiService {
         @POST("/accounts/login")
@@ -48,9 +55,24 @@ interface ApiService {
         suspend fun register(@Body request: Account, @Query("password") password: String): Response<RegisterResponse>
 
         @GET("/accounts/profile")
-        suspend fun getProfile(): Response<ProfileResponse>
+        suspend fun getProfile(@Header("Authorization") authHeader: String): Response<AccountDto>
 
         @GET("/posts")
-        suspend fun getPosts(): Response<List<PostResponse>>
+        suspend fun getPosts(@Header("Authorization") authHeader: String): Response<List<PostDto>>
+
+        @Multipart
+        @POST("audiofiles/upload")
+        suspend fun uploadAudio(
+                @Header("Authorization") authHeader: String,
+                @Part file: MultipartBody.Part,
+                @Part("title") title: RequestBody,
+                @Part("duration") duration: RequestBody
+        ): Response<AudioFileDto>
+
+        @POST("/posts")
+        suspend fun createPost(@Header("Authorization") authHeader: String, @Body post: Post): Response<Void>
+
+        @GET("posts/{id}")
+        suspend fun getPostById(@Path("id") postId: Long): Post
 }
 

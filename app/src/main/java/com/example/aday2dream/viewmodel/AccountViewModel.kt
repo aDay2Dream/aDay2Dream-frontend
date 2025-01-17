@@ -1,4 +1,4 @@
-package com.example.aday2dream
+package com.example.aday2dream.viewmodel
 
 import android.util.Log
 import androidx.datastore.preferences.core.edit
@@ -7,23 +7,37 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aday2dream.data.Account
+import com.example.aday2dream.model.dto.AccountLoginDto
+import com.example.aday2dream.App
+import com.example.aday2dream.dataStore
+import com.example.aday2dream.model.Account
+import com.example.aday2dream.model.api.RetrofitClient
+import com.example.aday2dream.model.dto.AccountDto
+import com.example.aday2dream.model.repository.AccountRepository
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
-class AccountViewModel : ViewModel() {
-    private var loginResponse: String? = null
 
+class AccountViewModel(val repository: AccountRepository) : ViewModel() {
+    private var loginResponse: String? = null
+    private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
+    val loginState: StateFlow<LoginState> get() = _loginState
     private var registerResponse: String? = null
 
     private val _registrationState = MutableLiveData<String?>()
     val registrationState: LiveData<String?> get() = _registrationState
 
-    private val dataStore = App.appContext.dataStore // Assuming DataStore is set up
+    private val _profile = MutableLiveData<AccountDto?>()
+    val profile: MutableLiveData<AccountDto?> get() = _profile
+
+    private val dataStore = App.appContext.dataStore
 
     fun saveAuthToken(token: String) {
         viewModelScope.launch {
@@ -51,22 +65,26 @@ class AccountViewModel : ViewModel() {
 
                     if (!token.isNullOrEmpty()) {
                         println("Login successful")
+                        _loginState.value = LoginState.Success(token)
                         withContext(Dispatchers.Main){
                             onResult(null, token)
                         }
                          // Login successful, return token
                     } else {
+                        _loginState.value = LoginState.Error("Token not found.")
                         withContext(Dispatchers.Main) {
                             onResult("Token not found in response", null)
                         }
                     }
                 } else {
+                    _loginState.value = LoginState.Error("Login failed: ${response.message()}")
                     withContext(Dispatchers.Main) {
                         onResult("Login failed: ${response.code()} ${response.message()}", null)
                     }
 
                 }
             } catch (e: Exception) {
+                _loginState.value = LoginState.Error("Error: ${e.localizedMessage}")
                 onResult("Error: ${e.localizedMessage}", null)
             }
         }
@@ -113,6 +131,36 @@ class AccountViewModel : ViewModel() {
         }
 
     }
+
+    fun fetchProfile(
+    ) {
+        viewModelScope.launch {
+            try {
+                val profileData = repository.getProfile()
+                if (profileData != null) {
+                    _profile.postValue(profileData)
+                }
+            } catch (e: Exception) {
+                Log.e("AccountViewModel", "Error fetching profile: ${e.message}")
+            }
+        }
+    }
+
 }
+
+sealed class LoginState {
+    object Idle : LoginState()
+    object Loading : LoginState()
+    data class Success(val token: String) : LoginState()
+    data class Error(val message: String) : LoginState()
+}
+
+sealed class RegisterState {
+    object Idle : RegisterState()
+    object Loading : RegisterState()
+    object Success : RegisterState()
+    data class Error(val message: String) : RegisterState()
+}
+
 
 

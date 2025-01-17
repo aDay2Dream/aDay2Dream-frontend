@@ -1,5 +1,6 @@
 package com.example.aday2dream.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -7,10 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -35,19 +39,31 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import com.example.aday2dream.viewmodel.AccountViewModel
 import com.example.aday2dream.R
 import com.example.aday2dream.model.Post
+import com.example.aday2dream.model.dto.PostDto
+import com.example.aday2dream.viewmodel.PostViewModel
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePage(navController: NavController, viewModel: AccountViewModel)
-{
+fun HomeScreen(navigateToPost: (postId: String) -> Unit, navigateToAddPost: () -> Unit, navigateToProfile: () -> Unit,  viewModel: PostViewModel) {
+    val posts by viewModel.posts.observeAsState(emptyList())
+    val error by viewModel.error.observeAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchPosts()
+    }
     val scrollState = rememberScrollState()
-    Scaffold( modifier = Modifier.background(colorResource(R.color.pink_secondary)),
+    Scaffold(modifier = Modifier.background(colorResource(R.color.pink_secondary)),
         /*topBar = {
             TopAppBar(
                 modifier = Modifier.clip(
@@ -73,35 +89,51 @@ fun HomePage(navController: NavController, viewModel: AccountViewModel)
 
          */
         bottomBar = {
-            BottomAppBar(modifier = Modifier.height(120.dp).clip(RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)).border(width = 2.dp, color = colorResource(
-                R.color.purple_main
-            ), shape = RoundedCornerShape(20.dp)),
+            BottomAppBar(
+                modifier = Modifier.height(120.dp)
+                    .clip(RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)).border(
+                        width = 2.dp, color = colorResource(
+                            R.color.purple_main
+                        ), shape = RoundedCornerShape(20.dp)
+                    ),
                 containerColor = colorResource(R.color.pink_secondary)
             ) {
-                Row(modifier = Modifier.fillMaxWidth(),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly) {
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
                     IconButton(onClick = {}) {
                         Icon(
-                            imageVector = Icons.Default.Search, contentDescription = "account", tint = colorResource(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "account",
+                            tint = colorResource(
                                 R.color.purple_main
                             )
                         )
                     }
                     FloatingActionButton(
-                        modifier = Modifier.clip(CircleShape).background(colorResource(R.color.purple_main)),
-                        onClick = { navController.navigate("addpost") },
+                        modifier = Modifier.clip(CircleShape)
+                            .background(colorResource(R.color.purple_main)),
+                        onClick = { navigateToAddPost() },
                         containerColor = colorResource(R.color.purple_main),
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                     ) {
-                        Icon(modifier = Modifier.clip(
-                            CircleShape).background(colorResource(R.color.pink_secondary)), imageVector = Icons.Default.Add, contentDescription =  "Localized description")
+                        Icon(
+                            modifier = Modifier.clip(
+                                CircleShape
+                            ).background(colorResource(R.color.pink_secondary)),
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Localized description"
+                        )
                     }
                     IconButton(onClick = {
-                        navController.navigate("account")
+                        navigateToAddPost()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.AccountCircle, contentDescription = "account", tint = colorResource(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "account",
+                            tint = colorResource(
                                 R.color.purple_main
                             )
                         )
@@ -109,65 +141,68 @@ fun HomePage(navController: NavController, viewModel: AccountViewModel)
                 }
             }
         }
-)
+    )
     { innerPadding ->
-    Column(
-        modifier = Modifier
-            .padding(innerPadding).background(colorResource(R.color.pink_secondary)).fillMaxHeight().verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-            PostCard(Post(title = "Selling this", description = "aaaaaa", isActive = true, price = 40), navController)
-        PostCard(Post(title = "Selling this", description = "aaaaaa", isActive = true, price = 40), navController)
-        PostCard(Post(title = "Selling this", description = "aaaaaa", isActive = true, price = 40), navController)
-        PostCard(Post(title = "Selling this", description = "aaaaaa", isActive = true, price = 40), navController)
-        PostCard(Post(title = "Selling this", description = "aaaaaa", isActive = true, price = 40), navController)
-        PostCard(Post(title = "Selling this", description = "aaaaaa", isActive = true, price = 40), navController)
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            items(posts) { post ->
+                Log.d("Home Page", "{$post}")
+                PostItem(post)
+            }
         }
+
     }
 }
 
-@Composable
-fun PostCard(post: Post, navController: NavController) {
-    Card(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).padding(10.dp).height(120.dp).clickable {
-        navController.navigate("post")
-    }) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        )
-         {
-            Column(
-                modifier = Modifier.width(120.dp).clip(RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp)),
-                horizontalAlignment = AbsoluteAlignment.Left
+    @Composable
+    fun PostItem(post: PostDto) {
+        Card(
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).padding(10.dp)
+                .height(120.dp).clickable {
+
+            }) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
             )
             {
-                FloatingActionButton(
-                    modifier = Modifier.fillMaxHeight().width(80.dp).clip(RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp)),
-                    onClick = {
+                Column(
+                    modifier = Modifier.width(120.dp)
+                        .clip(RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp)),
+                    horizontalAlignment = AbsoluteAlignment.Left
+                )
+                {
+                    FloatingActionButton(
+                        modifier = Modifier.fillMaxHeight().width(80.dp)
+                            .clip(RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp)),
+                        onClick = {
 
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "play")
                     }
+                }
+                Row()
+                {
+                    Column() {
+                        Text(post.title)
+                        Text(post.description)
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "play")
-                }
-            }
-            Row()
-            {
-                Column() {
-                    Text(post.title)
-                    Text(post.description)
-                }
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(10.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Top
-                ){
-                Column(verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = AbsoluteAlignment.Right) {
-                    Text(text = post.price.toString())
-                }
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = AbsoluteAlignment.Right
+                    ) {
+                        Text(text = post.price.toString())
+                    }
 
+                }
             }
         }
     }
-}
+
 
 

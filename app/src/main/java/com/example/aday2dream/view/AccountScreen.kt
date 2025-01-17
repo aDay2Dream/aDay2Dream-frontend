@@ -28,11 +28,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.aday2dream.R
+import com.example.aday2dream.viewmodel.AccountViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountPage(navController: NavController) {
+fun AccountScreen(navController: NavController, viewModel: AccountViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(

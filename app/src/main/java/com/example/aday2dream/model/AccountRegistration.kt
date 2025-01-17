@@ -1,4 +1,4 @@
-package com.example.aday2dream.data
+package com.example.aday2dream.model
 
 
 data class AccountRegistration(
