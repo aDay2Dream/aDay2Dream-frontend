@@ -55,7 +55,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 navigateToPost = { postId ->
                     navController.navigate(
                         com.example.aday2dream.navigation.Screen.Post.createRoute(
-                            postId
+                            postId.toString()
                         )
                     )
                 },
@@ -73,15 +73,18 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 postViewModel = postViewModel
             )
         }
+        composable(com.example.aday2dream.navigation.Screen.Post.route) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId")
+            if (postId != null) {
+                PostScreen(postId = postId, postViewModel, navController)
+            }
+    }
     }
 }
-/*
-        // Post Details Screen
-        composable(Screen.Post.route) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getString("postId")
-            PostScreen(postId = postId)
-        }
 
+
+
+    /*
         // Add Post Screen
 
 

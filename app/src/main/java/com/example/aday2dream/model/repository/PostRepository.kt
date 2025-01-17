@@ -5,7 +5,6 @@ import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
 import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.api.ApiService
-import com.example.aday2dream.model.dto.PostDto
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import retrofit2.Response
@@ -20,8 +19,10 @@ class PostRepository(private val api: ApiService) {
             .first()}",post)
     }
 
-    suspend fun getPostById(postId: Long): Post {
-        return api.getPostById(postId)
+    suspend fun getPostById(postId: String): Post {
+        return api.getPostById("Bearer ${dataStore.data
+            .map { it[AUTH_TOKEN] }
+            .first()}",postId)
     }
-
 }
+

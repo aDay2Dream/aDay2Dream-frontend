@@ -55,7 +55,7 @@ import com.example.aday2dream.viewmodel.PostViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navigateToPost: (postId: String) -> Unit, navigateToAddPost: () -> Unit, navigateToProfile: () -> Unit,  viewModel: PostViewModel) {
+fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> Unit, navigateToProfile: () -> Unit,  viewModel: PostViewModel) {
     val posts by viewModel.posts.observeAsState(emptyList())
     val error by viewModel.error.observeAsState()
 
@@ -146,7 +146,7 @@ fun HomeScreen(navigateToPost: (postId: String) -> Unit, navigateToAddPost: () -
         LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             items(posts) { post ->
                 Log.d("Home Page", "{$post}")
-                PostItem(post)
+                PostItem(post, navigateToPost = navigateToPost)
             }
         }
 
@@ -154,11 +154,11 @@ fun HomeScreen(navigateToPost: (postId: String) -> Unit, navigateToAddPost: () -
 }
 
     @Composable
-    fun PostItem(post: PostDto) {
+    fun PostItem(post: PostDto, navigateToPost: (postId: Long) -> Unit) {
         Card(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).padding(10.dp)
                 .height(120.dp).clickable {
-
+                    navigateToPost(post.id)
             }) {
             Row(
                 modifier = Modifier.fillMaxWidth()

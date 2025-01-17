@@ -108,7 +108,7 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
             }
         }
     }
-    fun getPostById(postId: Long) {
+    fun getPostById(postId: String) {
         viewModelScope.launch {
             try {
                 val fetchedPost = postRepository.getPostById(postId)

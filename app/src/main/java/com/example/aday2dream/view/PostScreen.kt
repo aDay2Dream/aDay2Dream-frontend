@@ -42,7 +42,7 @@ import androidx.compose.material3.IconButton
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
-    postId: Long,
+    postId: String,
     postViewModel: PostViewModel,
     navController: NavController
 ) {

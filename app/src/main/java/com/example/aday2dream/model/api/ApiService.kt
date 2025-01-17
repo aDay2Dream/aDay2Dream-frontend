@@ -73,6 +73,6 @@ interface ApiService {
         suspend fun createPost(@Header("Authorization") authHeader: String, @Body post: Post): Response<Void>
 
         @GET("posts/{id}")
-        suspend fun getPostById(@Path("id") postId: Long): Post
+        suspend fun getPostById(@Header("Authorization") authHeader: String, @Path("id") postId: String): Post
 }
 
