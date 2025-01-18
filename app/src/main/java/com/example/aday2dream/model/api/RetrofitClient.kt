@@ -1,4 +1,4 @@
-package com.example.aday2dream
+package com.example.aday2dream.model.api
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

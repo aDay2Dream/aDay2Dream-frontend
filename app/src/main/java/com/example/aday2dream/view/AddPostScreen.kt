@@ -1,20 +1,16 @@
 package com.example.aday2dream.view
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,181 +20,182 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.aday2dream.R
-import com.example.aday2dream.model.Post
-import kotlinx.coroutines.launch
-import java.time.LocalDateTime
+import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.viewmodel.AudioFileViewModel
+import com.example.aday2dream.viewmodel.PostViewModel
+import java.math.BigDecimal
+
 
 @SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPostPage(navController: NavController)
-{
-    var post by remember { mutableStateOf(Post(createdAt = LocalDateTime.now())) }
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+fun AddPostScreen(
+    onPostCreated: () -> Unit,
+    audioFileViewModel: AudioFileViewModel,
+    postViewModel: PostViewModel,
+    accountViewModel: AccountViewModel
+) {
+    val profile by accountViewModel.profile.observeAsState()
+    var postTitle by remember { mutableStateOf("") }
+    var postDescription by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var audioTitle by remember { mutableStateOf("") }
+    var audioDuration by remember { mutableStateOf("") }
+    var fileUri by remember { mutableStateOf<Uri?>(null) }
+    var message by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    // Launcher for picking audio files
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            fileUri = uri
+            message = "File selected: ${uri.lastPathSegment}"
+        } else {
+            message = "No file selected"
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        accountViewModel.fetchProfile()
+    }
+
+
+
+
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = SnackbarHostState()) },
         topBar = {
-                   TopAppBar(
-                       modifier = Modifier.clip(
-                           RoundedCornerShape(20.dp)).border(width = 2.dp, color = colorResource(R.color.purple_main), shape = RoundedCornerShape(20.dp))
-                       ,
-                       colors = TopAppBarColors(
-                           containerColor = colorResource(R.color.pink_secondary),
-                           scrolledContainerColor = colorResource(R.color.pink_secondary),
-                           navigationIconContentColor = colorResource(R.color.pink_secondary),
-                           titleContentColor = colorResource(R.color.pink_secondary),
-                           actionIconContentColor = colorResource(R.color.pink_secondary)
-                       ),
-                       title = {}
-                   )
-                   Row(modifier = Modifier.fillMaxWidth().padding(50.dp), horizontalArrangement = Arrangement.Center,
-                   verticalAlignment = Alignment.Bottom){
-                       Image(painter = painterResource(R.drawable.logo_name),
-                           contentDescription = stringResource(R.string.logo_content_description))
-
-                   }
-
-               }
-
-
-        /*bottomBar = {
-            BottomAppBar(modifier = Modifier.height(120.dp).clip(RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)).border(width = 2.dp, color = colorResource(R.color.purple_main), shape = RoundedCornerShape(20.dp)),
-                containerColor = colorResource(R.color.pink_secondary)
-            ) {
-                Row(modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly) {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Default.Search, contentDescription = "account", tint = colorResource(R.color.purple_main)
-                        )
-                    }
-                    FloatingActionButton(
-                        modifier = Modifier.clip(CircleShape).background(colorResource(R.color.purple_main)),
-                        onClick = { navController.navigate("post_page")},
-                        containerColor = colorResource(R.color.purple_main),
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-                    ) {
-                        Icon(modifier = Modifier.clip(
-                            CircleShape
-                        ).background(colorResource(R.color.pink_secondary)), imageVector =  Icons.Default.Add, contentDescription =  "Localized description")
-                    }
-                    IconButton(onClick = {
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle, contentDescription = "account", tint = colorResource(R.color.purple_main)
-                        )
-                    }
-                }
-            }
+            TopAppBar(
+                title = {
+                    Image(
+                        painter = painterResource(R.drawable.logo_name),
+                        contentDescription = stringResource(R.string.logo_content_description)
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = colorResource(R.color.pink_secondary)
+                )
+            )
         }
-
-         */
-    )
-    {innerPadding ->
+    ) { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ){
-            TitleTextField(
-                modifier = Modifier.width(300.dp),
-                value = post.title,
-                onChange = {data -> post = post.copy(title = data)}
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Input fields for post details
+            OutlinedTextField(
+                value = postTitle,
+                onValueChange = { postTitle = it },
+                label = { Text("Post Title") },
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.width(10.dp))
-            DescriptionTextField(
-                modifier = Modifier.width(300.dp).height(200.dp),
-                value = post.description,
-                onChange = {data -> post = post.copy(description = data)}
+
+            OutlinedTextField(
+                value = postDescription,
+                onValueChange = { postDescription = it },
+                label = { Text("Post Description") },
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.width(10.dp))
-            Button(modifier = Modifier.size(150.dp, 50.dp), onClick = {
-                    if(post.isNotEmpty())
-                    {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Post created!")
+
+            OutlinedTextField(
+                value = price,
+                onValueChange = { price = it },
+                label = { Text("Price") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = { launcher.launch("audio/*") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Select Audio File")
+            }
+
+            // Audio file details (if selected)
+            if (fileUri != null) {
+                OutlinedTextField(
+                    value = audioTitle,
+                    onValueChange = { audioTitle = it },
+                    label = { Text("Audio Title") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = audioDuration,
+                    onValueChange = { audioDuration = it },
+                    label = { Text("Audio Duration (e.g., 3:45)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Button(
+                onClick = {
+                    audioFileViewModel.uploadAudio(
+                        context = context,
+                        fileUri = fileUri!!,
+                        title = audioTitle,
+                        duration = audioDuration,
+                        onSuccess = { uploadedAudio ->
+                            Log.d("onSuccess uploadAudio", uploadedAudio.toString())
+                            postViewModel.createPost(
+                                postTitle = postTitle,
+                                postDescription = postDescription,
+                                price = price.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                                audioFile = uploadedAudio,
+                                account = profile!!,
+                                backgroundImage = "",
+                                onSuccess = {
+                                    message = "Post created successfully!"
+                                    onPostCreated()
+                                },
+                                onError = { err ->
+                                    message = err
+                                }
+                            )
+                        },
+                        onError = { err ->
+                            message = err
                         }
-                        navController.navigate("home")
-                    }
-            }){
-                Text("Add post!")
+                    )
+        },
+
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Submit Post")
+            }
+
+            if (message.isNotEmpty()) {
+                Text(
+                    text = message,
+                    color = if (message.contains("success", true)) Color.Green else Color.Red,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         }
     }
 }
 
-
-
-
-@Composable
-fun TitleTextField(
-    value: String,
-    onChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.title_post),
-) {
-
-    val focusManager = LocalFocusManager.current
-
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onChange,
-        modifier = modifier,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
-        ),
-        label = { Text(label) },
-        singleLine = true,
-        visualTransformation = VisualTransformation.None
-    )
-}
-
-@Composable
-fun DescriptionTextField(
-    value: String,
-    onChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.description_post),
-) {
-
-    val focusManager = LocalFocusManager.current
-
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onChange,
-        modifier = modifier,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
-        ),
-        label = { Text(label) },
-        singleLine = true,
-        visualTransformation = VisualTransformation.None
-    )
-}

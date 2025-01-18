@@ -48,18 +48,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.aday2dream.model.dto.AccountLoginDto
 import com.example.aday2dream.viewmodel.AccountViewModel
 import com.example.aday2dream.R
 import com.example.aday2dream.viewmodel.LoginState
 
-@Composable
-fun LoginPage(navController: NavController, viewModel: AccountViewModel, onLoginSuccess: () -> Unit) {
 
-    var message by remember { mutableStateOf<String?>(null) }
-    var scrollState = rememberScrollState()
-    val scope = rememberCoroutineScope()
+@Composable
+fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, viewModel: AccountViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     var errorMessage by remember { mutableStateOf("") }
     val loginState by viewModel.loginState.collectAsState()
@@ -102,21 +98,15 @@ fun LoginPage(navController: NavController, viewModel: AccountViewModel, onLogin
                     } else if (token != null) {
                         viewModel.saveAuthToken(token)
                         Log.d("Login Button", "Token Saved")// Save the token
-                        navController.navigate("home") // Navigate to the profile page
+                        onLoginSuccess() // Navigate to the profile page
                     }
                 }
             })
             {
                 Text(stringResource(R.string.login_button_text));
             }
-            /*
-            LabeledCheckbox(
-                label = "Remember me",
-                onCheckChanged = { credentials = credentials.copy(remember = !credentials.remember) },
-                isChecked = credentials.remember
-            )
-             */
-            RegisterTextButton(navController)
+
+            RegisterTextButton(onClick = {onNavigateToRegister()})
 
             when (loginState) {
                 is LoginState.Loading -> CircularProgressIndicator()
@@ -189,7 +179,7 @@ fun PasswordField(
 
 @SuppressLint("NewApi")
 @Composable
-fun RegisterTextButton(navController: NavController)
+fun RegisterTextButton(onClick: () -> Unit)
 {
     Row(){
         Text(
@@ -197,7 +187,6 @@ fun RegisterTextButton(navController: NavController)
         )
         Text(
             modifier = Modifier.clickable{
-                navController.navigate("register")
             },
             text = stringResource(R.string.register_button_text),
             color = colorResource(R.color.purple_secondary)

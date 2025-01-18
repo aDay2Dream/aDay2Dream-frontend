@@ -1,18 +1,20 @@
-package com.example.aday2dream.data
+package com.example.aday2dream.model
 
 import android.annotation.SuppressLint
+import com.example.aday2dream.model.dto.AccountDto
+import com.example.aday2dream.model.dto.AudioFileDto
 import com.google.gson.Gson
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @SuppressLint("NewApi")
 data class Post (
+    var account: AccountDto,
+    var audiofile: AudioFileDto,
     var title: String = "",
     var description: String = "",
-    var price: Int = 0,
-    var isActive: Boolean = true,
-    var createdAt: LocalDateTime = LocalDateTime.now(),
-    var updatedAt: LocalDateTime = LocalDateTime.now(),
-    var tasks: Int = 0,
+    var price: BigDecimal?,
+    var backgroundImage: String = "",
 ){
     fun isNotEmpty() : Boolean {
         return title.isNotEmpty() && description.isNotEmpty()
