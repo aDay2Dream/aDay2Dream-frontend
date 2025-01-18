@@ -128,7 +128,7 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
                         )
                     }
                     IconButton(onClick = {
-                        navigateToAddPost()
+                        navigateToProfile()
                     }) {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
@@ -158,7 +158,7 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
         Card(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).padding(10.dp)
                 .height(120.dp).clickable {
-                    navigateToPost(post.id)
+                    navigateToPost(post.postId)
             }) {
             Row(
                 modifier = Modifier.fillMaxWidth()

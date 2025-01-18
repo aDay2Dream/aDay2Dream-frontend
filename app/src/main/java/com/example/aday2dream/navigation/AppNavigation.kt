@@ -79,6 +79,14 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 PostScreen(postId = postId, postViewModel, navController)
             }
     }
+        composable(com.example.aday2dream.navigation.Screen.Profile.route) {
+            AccountScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateLogin = { navController.navigate(com.example.aday2dream.navigation.Screen.Login.route) },
+                accountViewModel = accountViewModel,
+                postViewModel = postViewModel
+            )
+        }
     }
 }
 
@@ -89,11 +97,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
 
 
         // Profile Screen
-        composable(Screen.Profile.route) {
-            ProfileScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
+
 
         // Add Prompt Screen
         composable(Screen.AddPrompt.route) {

@@ -74,5 +74,14 @@ interface ApiService {
 
         @GET("posts/{id}")
         suspend fun getPostById(@Header("Authorization") authHeader: String, @Path("id") postId: String): Post
+
+        @DELETE("/profile")
+        suspend fun deleteAccount(@Header("Authorization") authHeader: String): Response<Unit>
+
+        @POST("/accounts/logout")
+        suspend fun logoutAccount(@Header("Authorization") authHeader: String): Response<Unit>
+
+        @GET("/posts/account/{accountId}")
+        suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<PostDto>>
 }
 

@@ -37,6 +37,9 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
     private val _profile = MutableLiveData<AccountDto?>()
     val profile: MutableLiveData<AccountDto?> get() = _profile
 
+    private val _error = MutableLiveData<String>()
+    val error: MutableLiveData<String> get() = _error
+
     private val dataStore = App.appContext.dataStore
 
     fun saveAuthToken(token: String) {
@@ -146,7 +149,29 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
         }
     }
 
+    fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                repository.deleteAccount()
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.localizedMessage ?: "Error deleting account")
+            }
+        }
+    }
+    fun logoutAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                repository.logoutAccount()
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.localizedMessage ?: "Error deleting account")
+            }
+        }
+    }
+
 }
+
 
 sealed class LoginState {
     object Idle : LoginState()

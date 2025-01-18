@@ -26,7 +26,7 @@ import java.math.BigDecimal
 
 class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
     private val _posts = MutableLiveData<List<PostDto>>()
-    val posts: LiveData<List<PostDto>> get() = _posts
+    val posts: MutableLiveData<List<PostDto>> get() = _posts
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
@@ -118,6 +118,21 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
             }
         }
     }
+
+    fun fetchPostsByAccount(
+        accountId: Long
+    ) {
+        viewModelScope.launch {
+            try{
+            val accountPosts = postRepository.getPostsByAccountId(accountId)
+            _posts.postValue(accountPosts)
+        } catch (e: Exception) {
+            _error.postValue(e.localizedMessage)
+        }
+    }
+
+}
+
 
 }
 
