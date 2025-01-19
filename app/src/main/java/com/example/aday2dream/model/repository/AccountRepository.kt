@@ -3,6 +3,7 @@ package com.example.aday2dream.model.repository
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
+import com.example.aday2dream.model.Account
 import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.api.ApiService
 import com.example.aday2dream.model.dto.AccountDto
@@ -33,6 +34,21 @@ class AccountRepository(private val apiService: ApiService) {
         }
     }
 
+    suspend fun updateProfile(accountId: Long, account: Account, password: String): AccountDto? {
+
+        val response = apiService.updateAccount(authHeader = "Bearer ${dataStore.data
+            .map { it[AUTH_TOKEN] }
+            .first()}",accountId, account, password)
+        if(response.isSuccessful)
+        {
+            return response.body()
+        }
+        else{
+            throw Exception("Failed to update account: ${response.message()}")
+        }
+    }
+
+
     suspend fun logoutAccount() {
         val response = apiService.logoutAccount(authHeader = "Bearer ${dataStore.data
             .map { it[AUTH_TOKEN] }
@@ -41,4 +57,6 @@ class AccountRepository(private val apiService: ApiService) {
             throw Exception("Failed to logout of account: ${response.message()}")
         }
     }
+
+
 }

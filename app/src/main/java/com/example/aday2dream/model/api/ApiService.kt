@@ -83,5 +83,8 @@ interface ApiService {
 
         @GET("/posts/account/{accountId}")
         suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<PostDto>>
+
+        @PUT("accounts/{id}")
+        suspend fun updateAccount(@Header("Authorization") authHeader: String,  @Path("id") accountId: Long, @Body account: Account, @Query("password") password: String): Response<AccountDto>
 }
 

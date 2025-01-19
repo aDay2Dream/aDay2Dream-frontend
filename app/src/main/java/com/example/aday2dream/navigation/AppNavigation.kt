@@ -22,11 +22,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             LoginScreen(
                 onNavigateToRegister = { navController.navigate(com.example.aday2dream.navigation.Screen.Register.route) },
                 onLoginSuccess = {
-                    navController.navigate(com.example.aday2dream.navigation.Screen.Home.route) {
-                        popUpTo(com.example.aday2dream.navigation.Screen.Login.route) {
-                            inclusive = true
-                        }
-                    }
+                    navController.navigate(com.example.aday2dream.navigation.Screen.Home.route)
                 },
                 viewModel = accountViewModel
 
@@ -83,11 +79,22 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             AccountScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateLogin = { navController.navigate(com.example.aday2dream.navigation.Screen.Login.route) },
+                onEditInfo = {navController.navigate(com.example.aday2dream.navigation.Screen.EditAccount.route)},
                 accountViewModel = accountViewModel,
                 postViewModel = postViewModel
             )
         }
+        composable(com.example.aday2dream.navigation.Screen.EditAccount.route){
+            EditAccountScreen(
+            onNavigateBack = { navController.popBackStack() },
+            onNavigateLogin = { navController.navigate(com.example.aday2dream.navigation.Screen.Login.route){
+                popUpTo(0)
+            } },
+                accountViewModel = accountViewModel
+            )
+        }
     }
+
 }
 
 

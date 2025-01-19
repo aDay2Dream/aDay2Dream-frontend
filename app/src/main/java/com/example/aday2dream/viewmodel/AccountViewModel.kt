@@ -149,6 +149,36 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
         }
     }
 
+    fun updateProfile(
+        accountId: Long,
+        password: String,
+        firstName: String,
+        lastName: String,
+        email: String,
+        username: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val updatedProfile = repository.updateProfile(accountId,
+                    Account(
+                        firstName = firstName,
+                        lastName = lastName,
+                        email = email,
+                        username = username
+                    ),
+                    password = password
+                )
+                _profile.postValue(updatedProfile)
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.localizedMessage ?: "Unknown error")
+            }
+        }
+    }
+
+
     fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             try {

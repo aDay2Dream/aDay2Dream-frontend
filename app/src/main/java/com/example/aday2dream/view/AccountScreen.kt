@@ -25,6 +25,7 @@ import com.example.aday2dream.viewmodel.PostViewModel
 fun AccountScreen(
     onNavigateLogin: () -> Unit,
     onNavigateBack: () -> Unit,
+    onEditInfo: () -> Unit,
     accountViewModel: AccountViewModel,
     postViewModel: PostViewModel
 ) {
@@ -62,9 +63,7 @@ fun AccountScreen(
                     AccountDetails(
                         account = account,
                         posts = posts,
-                        onEditInfo = {
-
-                        },
+                        onEditInfo = onEditInfo,
                         onDeleteAccount = {
                             accountViewModel.deleteAccount(
                                 onSuccess = { onNavigateLogin() },
