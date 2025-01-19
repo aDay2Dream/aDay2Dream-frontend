@@ -64,15 +64,10 @@ fun AccountScreen(
                         account = account,
                         posts = posts,
                         onEditInfo = onEditInfo,
-                        onDeleteAccount = {
-                            accountViewModel.deleteAccount(
-                                onSuccess = { onNavigateLogin() },
-                                onError = { /* Handle delete error */ }
-                            )
-                        },
                         onLogoutAccount = {
                             accountViewModel.logoutAccount(
-                                onSuccess = { onNavigateLogin() },
+                                onSuccess = {
+                                    onNavigateLogin() },
                                 onError = {}
                             )
                         }
@@ -94,7 +89,6 @@ fun AccountDetails(
     account: AccountDto,
     posts: List<PostDto>,
     onEditInfo: () -> Unit,
-    onDeleteAccount: () -> Unit,
     onLogoutAccount: () -> Unit
 ) {
     Column(
@@ -119,9 +113,6 @@ fun AccountDetails(
         ) {
             Button(onClick = onEditInfo) {
                 Text("Edit Info")
-            }
-            Button(onClick = onDeleteAccount, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
-                Text("Delete Account")
             }
             Button(onClick = onLogoutAccount, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
             Text("Log Out")

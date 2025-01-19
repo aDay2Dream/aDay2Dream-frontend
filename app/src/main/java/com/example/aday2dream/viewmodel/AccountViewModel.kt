@@ -57,6 +57,15 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
         }
     }
 
+    fun deleteAuthToken(){
+        viewModelScope.launch{
+            dataStore.edit { preferences ->
+                preferences[stringPreferencesKey("auth_token")] = ""
+            }
+            println("Auth Token saved")
+        }
+    }
+
     fun login(accountLoginDto: AccountLoginDto, onResult: (String?, String?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -193,6 +202,7 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.logoutAccount()
+                deleteAuthToken()
                 onSuccess()
             } catch (e: Exception) {
                 onError(e.localizedMessage ?: "Error deleting account")

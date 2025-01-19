@@ -43,12 +43,7 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 Log.d("Post View Model", "Entered try statement")
-                val response = RetrofitClient.api.getPosts(authHeader = "Bearer ${dataStore.data
-                    .map { it[KEY_AUTH_TOKEN] }
-                    .first()}")
-                dataStore.data
-                    .map { it[KEY_AUTH_TOKEN] }
-                    .first()?.let { Log.d("Post View Model", it) }
+                val response = postRepository.fetchPosts()
                 Log.d("Post View Model", response.toString())
                 if (response.isSuccessful) {
                     Log.d("Post View Model", response.body().toString())
