@@ -1,5 +1,6 @@
 package com.example.aday2dream.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.navigation.NavController
+import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.dto.AccountDto
 import com.example.aday2dream.model.dto.PostDto
 import com.example.aday2dream.viewmodel.AccountViewModel
@@ -26,6 +27,7 @@ fun AccountScreen(
     onNavigateLogin: () -> Unit,
     onNavigateBack: () -> Unit,
     onEditInfo: () -> Unit,
+    onEditPost: (postId: Long) -> Unit,
     accountViewModel: AccountViewModel,
     postViewModel: PostViewModel
 ) {
@@ -37,7 +39,7 @@ fun AccountScreen(
 
     LaunchedEffect(Unit) {
         accountViewModel.fetchProfile()
-        profile?.let { postViewModel.fetchPostsByAccount(it.accountId) } // Fetch posts made by this account
+        profile?.let { it.accountId?.let { it1 -> postViewModel.fetchPostsByAccount(it1) } } // Fetch posts made by this account
     }
 
     Scaffold(
@@ -70,7 +72,10 @@ fun AccountScreen(
                                     onNavigateLogin() },
                                 onError = {}
                             )
-                        }
+                        },
+                        onEditPost = onEditPost,
+                        postViewModel = postViewModel,
+                        onNavigateBack = onNavigateBack
                     )
                 } ?: error?.let {
                     Text(
@@ -86,11 +91,15 @@ fun AccountScreen(
 
 @Composable
 fun AccountDetails(
+    postViewModel: PostViewModel,
     account: AccountDto,
-    posts: List<PostDto>,
+    posts: List<Post>,
+    onEditPost: (postId: Long) -> Unit,
     onEditInfo: () -> Unit,
-    onLogoutAccount: () -> Unit
+    onLogoutAccount: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -129,7 +138,7 @@ fun AccountDetails(
         if (posts.isNotEmpty()) {
             LazyColumn {
                 items(posts) { post ->
-                    PostItem(post = post, onClick = { /* Navigate to Post Details */ })
+                    EditPostItem(post = post, onEditPost, postViewModel = postViewModel, onNavigateBack = onNavigateBack)
                 }
             }
         } else {
@@ -139,17 +148,31 @@ fun AccountDetails(
 }
 
 @Composable
-fun PostItem(post: PostDto, onClick: () -> Unit) {
+fun EditPostItem(post: Post, onEditPost: (postId: Long) -> Unit, postViewModel: PostViewModel, onNavigateBack: () -> Unit) {
+    Log.d("Edit Post Item", post.postId.toString())
+    val error by remember {mutableStateOf("")}
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = { post.postId?.let { onEditPost(it) } }),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = post.title, style = MaterialTheme.typography.titleMedium)
             Text(text = post.description, style = MaterialTheme.typography.bodyMedium)
+            Button(onClick = { post.postId?.let { onEditPost(it) } }, colors = ButtonDefaults.buttonColors(containerColor = Color.White)){
+                Text("Edit Post")
+            }
+            Button(onClick = { post.postId?.let {
+                postViewModel.deletePost(postId = it, onSuccess = {
+                    Log.d("Delete Post", "Post Deleted")
+                    onNavigateBack()
+                }, onError = {})
+            } }, colors = ButtonDefaults.buttonColors(containerColor = Color.White)){
+                Text("Delete Post")
+            }
         }
     }
 }

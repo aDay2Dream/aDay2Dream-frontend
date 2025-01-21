@@ -1,11 +1,14 @@
 package com.example.aday2dream.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.aday2dream.view.*
 import com.example.aday2dream.viewmodel.AccountViewModel
 import com.example.aday2dream.viewmodel.AudioFileViewModel
@@ -51,7 +54,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 navigateToPost = { postId ->
                     navController.navigate(
                         com.example.aday2dream.navigation.Screen.Post.createRoute(
-                            postId.toString()
+                            postId
                         )
                     )
                 },
@@ -69,32 +72,68 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 postViewModel = postViewModel
             )
         }
-        composable(com.example.aday2dream.navigation.Screen.Post.route) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getString("postId")
-            if (postId != null) {
-                PostScreen(postId = postId, postViewModel, navController)
+        composable(route = com.example.aday2dream.navigation.Screen.Post.route,
+            arguments = listOf(navArgument("postId") { type = NavType.LongType })
+        ) { backStackEntry ->
+                val postId = backStackEntry.arguments?.getLong("postId")
+                Log.d("Post Nav", "{postId: $postId}")
+                if (postId != null) {
+                    PostScreen(
+                        postId = postId,
+                        postViewModel = postViewModel,
+                        navController = navController
+                    )
+                } else {
+                    // Handle the case where postId is null
+                    Log.e("Navigation", "Post ID is null!")
+                }
             }
-    }
+
         composable(com.example.aday2dream.navigation.Screen.Profile.route) {
             AccountScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateLogin = { navController.navigate(com.example.aday2dream.navigation.Screen.Login.route) },
-                onEditInfo = {navController.navigate(com.example.aday2dream.navigation.Screen.EditAccount.route)},
+                onEditInfo = { navController.navigate(com.example.aday2dream.navigation.Screen.EditAccount.route) },
                 accountViewModel = accountViewModel,
-                postViewModel = postViewModel
+                postViewModel = postViewModel,
+                onEditPost = {
+                        postId ->
+                    navController.navigate(
+                        com.example.aday2dream.navigation.Screen.EditPost.createRoute(
+                            postId
+                        )
+                    )
+                }
             )
         }
-        composable(com.example.aday2dream.navigation.Screen.EditAccount.route){
+        composable(com.example.aday2dream.navigation.Screen.EditAccount.route) {
             EditAccountScreen(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateLogin = { navController.navigate(com.example.aday2dream.navigation.Screen.Login.route){
-                popUpTo(0)
-            } },
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateLogin = {
+                    navController.navigate(com.example.aday2dream.navigation.Screen.Login.route) {
+                        popUpTo(0)
+                    }
+                },
                 accountViewModel = accountViewModel
             )
         }
+        composable(route = com.example.aday2dream.navigation.Screen.EditPost.route,
+            arguments = listOf(navArgument("postId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getLong("postId")
+            Log.d("Edit Post Nav", "{postId: $postId}")
+            if (postId != null) {
+                EditPostScreen(
+                    postId = postId,
+                    postViewModel = postViewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            } else {
+                // Handle the case where postId is null
+                Log.e("Navigation", "Post ID is null!")
+            }
+        }
     }
-
 }
 
 

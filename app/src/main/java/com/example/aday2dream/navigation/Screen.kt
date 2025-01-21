@@ -11,6 +11,11 @@ sealed class Screen(val route: String) {
     object EditAccount: Screen("editAccount")
 
     object Post : Screen("post/{postId}") {
-        fun createRoute(postId: String) = "post/$postId"
+        fun createRoute(postId: Long) = "post/$postId"
+    }
+
+    object EditPost : Screen("editPost/{postId}")
+    {
+        fun createRoute(postId: Long) = "editPost/$postId"
     }
 }

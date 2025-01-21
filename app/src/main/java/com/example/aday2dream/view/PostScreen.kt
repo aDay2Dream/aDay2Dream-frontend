@@ -38,18 +38,19 @@ import com.example.aday2dream.viewmodel.PostViewModel
 import androidx.compose.material3.IconButton
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
-    postId: String,
+    postId: Long,
     postViewModel: PostViewModel,
     navController: NavController
 ) {
     val postState by postViewModel.post.collectAsState(initial = null)
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    Log.d("Post Screen", postViewModel.post.toString())
 
     LaunchedEffect(Unit) {
         postViewModel.getPostById(postId)

@@ -10,23 +10,20 @@ import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
 import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.dto.PostDto
-import com.example.aday2dream.model.api.RetrofitClient
 import com.example.aday2dream.model.dto.AccountDto
 import com.example.aday2dream.model.dto.AudioFileDto
 import com.example.aday2dream.model.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 
 class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
-    private val _posts = MutableLiveData<List<PostDto>>()
-    val posts: MutableLiveData<List<PostDto>> get() = _posts
+    private val _posts = MutableLiveData<List<Post>>()
+    val posts: MutableLiveData<List<Post>> get() = _posts
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
@@ -36,6 +33,7 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
 
     private val _post = MutableStateFlow<Post?>(null)
     val post: StateFlow<Post?> get() = _post
+
 
 
 
@@ -103,7 +101,7 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
             }
         }
     }
-    fun getPostById(postId: String) {
+    fun getPostById(postId: Long) {
         viewModelScope.launch {
             try {
                 val fetchedPost = postRepository.getPostById(postId)
@@ -118,16 +116,55 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
         accountId: Long
     ) {
         viewModelScope.launch {
-            try{
-            val accountPosts = postRepository.getPostsByAccountId(accountId)
-            _posts.postValue(accountPosts)
-        } catch (e: Exception) {
-            _error.postValue(e.localizedMessage)
+            try {
+                val accountPosts = postRepository.getPostsByAccountId(accountId)
+                _posts.postValue(accountPosts)
+            } catch (e: Exception) {
+                _error.postValue(e.localizedMessage)
+            }
         }
     }
 
-}
+        fun editPost(
+            postId: Long,
+            updatedPost: Post,
+            onSuccess: () -> Unit,
+            onError: (String) -> Unit
+        ) {
+            viewModelScope.launch {
+                try {
+                    val response = postRepository.updatePost(postId, updatedPost)
+                    if (response.isSuccessful) {
+                        onSuccess()
+                    } else {
+                        onError("Failed to update post: ${response.message()}")
+                    }
+                } catch (e: Exception) {
+                    onError("Error occurred: ${e.localizedMessage}")
+                }
+            }
+        }
+
+    fun deletePost(
+        postId: Long,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = postRepository.deletePost(postId)
+                if (response.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onError("Failed to update post: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                onError("Error occurred: ${e.localizedMessage}")
+            }
+        }
+    }
 
 
-}
+    }
+
 

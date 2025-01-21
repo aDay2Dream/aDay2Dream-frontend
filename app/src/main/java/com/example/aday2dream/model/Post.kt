@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 
 @SuppressLint("NewApi")
 data class Post (
+    val postId: Long? = null,
     var account: AccountDto,
     var audiofile: AudioFileDto,
     var title: String = "",

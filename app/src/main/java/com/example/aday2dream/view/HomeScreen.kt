@@ -154,11 +154,12 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
 }
 
     @Composable
-    fun PostItem(post: PostDto, navigateToPost: (postId: Long) -> Unit) {
+    fun PostItem(post: Post, navigateToPost: (postId: Long) -> Unit) {
+        Log.d("Post Item", "postId: {${post.postId}}")
         Card(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).padding(10.dp)
                 .height(120.dp).clickable {
-                    navigateToPost(post.postId)
+                    post.postId?.let { navigateToPost(it) }
             }) {
             Row(
                 modifier = Modifier.fillMaxWidth()

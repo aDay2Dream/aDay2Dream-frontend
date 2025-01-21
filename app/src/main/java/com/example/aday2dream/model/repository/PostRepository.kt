@@ -5,7 +5,6 @@ import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
 import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.api.ApiService
-import com.example.aday2dream.model.api.RetrofitClient
 import com.example.aday2dream.model.dto.PostDto
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -21,20 +20,26 @@ class PostRepository(private val api: ApiService) {
             .first()}",post)
     }
 
-    suspend fun fetchPosts() : Response<List<PostDto>>{
+    suspend fun fetchPosts() : Response<List<Post>>{
         return api.getPosts(authHeader = "Bearer ${dataStore.data
             .map { it[AUTH_TOKEN] }
             .first()}")
     }
 
 
-    suspend fun getPostById(postId: String): Post {
+    suspend fun getPostById(postId: Long): Post {
         return api.getPostById("Bearer ${dataStore.data
             .map { it[AUTH_TOKEN] }
             .first()}",postId)
     }
 
-    suspend fun getPostsByAccountId(accountId: Long): List<PostDto> {
+    suspend fun updatePost(postId: Long, updatedPost: Post) : Response<Post> {
+        return api.updatePost("Bearer ${dataStore.data
+            .map { it[AUTH_TOKEN] }
+            .first()}",postId, updatedPost)
+    }
+
+    suspend fun getPostsByAccountId(accountId: Long): List<Post> {
         val response = api.getPostsByAccount(
             authHeader = "Bearer ${dataStore.data
             .map { it[AUTH_TOKEN] }
@@ -44,6 +49,19 @@ class PostRepository(private val api: ApiService) {
         } else {
             throw Exception("Failed to fetch posts: ${response.message()}")
         }
+    }
+
+    suspend fun deletePost(postId: Long) : Response<Unit> {
+        return try{
+            val response = api.deletePost(
+                authHeader = "Bearer ${dataStore.data
+                    .map { it[AUTH_TOKEN] }
+                    .first()}", postId)
+            return response
+        } catch (e: Exception) {
+            throw Exception("Failed to delete post.")
+        }
+
     }
 }
 

@@ -58,7 +58,7 @@ interface ApiService {
         suspend fun getProfile(@Header("Authorization") authHeader: String): Response<AccountDto>
 
         @GET("/posts")
-        suspend fun getPosts(@Header("Authorization") authHeader: String): Response<List<PostDto>>
+        suspend fun getPosts(@Header("Authorization") authHeader: String): Response<List<Post>>
 
         @Multipart
         @POST("audiofiles/upload")
@@ -73,7 +73,7 @@ interface ApiService {
         suspend fun createPost(@Header("Authorization") authHeader: String, @Body post: Post): Response<Void>
 
         @GET("posts/{id}")
-        suspend fun getPostById(@Header("Authorization") authHeader: String, @Path("id") postId: String): Post
+        suspend fun getPostById(@Header("Authorization") authHeader: String, @Path("id") postId: Long): Post
 
         @DELETE("/profile")
         suspend fun deleteAccount(@Header("Authorization") authHeader: String): Response<Unit>
@@ -82,9 +82,16 @@ interface ApiService {
         suspend fun logoutAccount(@Header("Authorization") authHeader: String): Response<Unit>
 
         @GET("/posts/account/{accountId}")
-        suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<PostDto>>
+        suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<Post>>
 
         @PUT("accounts/{id}")
         suspend fun updateAccount(@Header("Authorization") authHeader: String,  @Path("id") accountId: Long, @Body account: Account, @Query("password") password: String): Response<AccountDto>
+
+        @PUT("posts/{id}")
+        suspend fun updatePost(@Header("Authorization") authHeader: String, @Path("id") postId: Long, @Body updatedPost: Post): Response<Post>
+
+        @DELETE("/posts/{id}")
+        suspend fun deletePost(@Header("Authorization") authHeader: String, @Path("id") postId: Long): Response<Unit>
+
 }
 

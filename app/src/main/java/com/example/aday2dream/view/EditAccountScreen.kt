@@ -104,22 +104,24 @@ fun EditAccountScreen(
             Button(
                 onClick = {
                     profile?.let {
-                        accountViewModel.updateProfile(
-                            accountId = profile!!.accountId,
-                            password = profile!!.password,
-                            firstName = firstName,
-                            lastName = lastName,
-                            email = email,
-                            username = username,
-                            onSuccess = {
-                                Toast.makeText(context, "Profile updated successfully!", Toast.LENGTH_LONG).show()
-                                onNavigateBack()
-                            },
-                            onError = {
-                                Toast.makeText(context, "Error updating profile: $it", Toast.LENGTH_LONG).show()
-                                Log.d("Edit Account Screen", it)
-                            }
-                        )
+                        profile!!.accountId?.let { it1 ->
+                            accountViewModel.updateProfile(
+                                accountId = it1,
+                                password = profile!!.password,
+                                firstName = firstName,
+                                lastName = lastName,
+                                email = email,
+                                username = username,
+                                onSuccess = {
+                                    Toast.makeText(context, "Profile updated successfully!", Toast.LENGTH_LONG).show()
+                                    onNavigateBack()
+                                },
+                                onError = {
+                                    Toast.makeText(context, "Error updating profile: $it", Toast.LENGTH_LONG).show()
+                                    Log.d("Edit Account Screen", it)
+                                }
+                            )
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.purple_main)),
