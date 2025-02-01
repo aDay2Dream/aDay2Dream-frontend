@@ -92,18 +92,22 @@ fun RegisterScreen(onNavigateBack: () -> Unit, onRegisterSuccess: () -> Unit, vi
                 NameField(
                     value = account.firstName,
                     onChange = { data -> account = account.copy(firstName = data) },
-                    modifier = Modifier.width(150.dp)
+                    modifier = Modifier.width(150.dp),
+                    label = "First Name"
                 )
                 NameField(
                     value = account.lastName,
                     onChange = { data -> account = account.copy(lastName = data) },
-                    modifier = Modifier.width(150.dp)
+                    modifier = Modifier.width(150.dp),
+                    label = "Last Name"
+
                 )
             }
             NameField(
                 value = account.email,
                 onChange = { data -> account = account.copy(email = data) },
-                modifier = Modifier.width(150.dp)
+                modifier = Modifier.width(150.dp),
+                label = "E-mail"
             )
 
             LoginField(
@@ -178,7 +182,7 @@ fun NameField(
     value: String,
     onChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.username),
+    label: String,
 ) {
 
     val focusManager = LocalFocusManager.current

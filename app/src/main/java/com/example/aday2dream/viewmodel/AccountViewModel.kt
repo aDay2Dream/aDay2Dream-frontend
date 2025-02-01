@@ -117,11 +117,12 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
                     username = username,
                     email = email,
                     firstName = firstName,
-                    lastName = lastName
+                    lastName = lastName,
+                    password = password
                 )
 
                 // Pass password as a query parameter
-                val response = RetrofitClient.api.register(accountDto, password)
+                val response = RetrofitClient.api.register(accountDto)
                 Log.d("Registration", response.toString())
                 if (response.isSuccessful) {
                     registerResponse = "Registration successful"

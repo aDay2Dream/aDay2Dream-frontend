@@ -1,5 +1,6 @@
 package com.example.aday2dream.navigation
 
+import AddPromptScreen
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.BlendMode.Companion.Screen
@@ -13,14 +14,15 @@ import com.example.aday2dream.view.*
 import com.example.aday2dream.viewmodel.AccountViewModel
 import com.example.aday2dream.viewmodel.AudioFileViewModel
 import com.example.aday2dream.viewmodel.PostViewModel
+import com.example.aday2dream.viewmodel.PromptViewModel
 
 @Composable
-fun AppNavigation(navController: NavHostController, accountViewModel: AccountViewModel, postViewModel: PostViewModel, audioFileViewModel: AudioFileViewModel) {
+fun AppNavigation(navController: NavHostController, accountViewModel: AccountViewModel, postViewModel: PostViewModel, audioFileViewModel: AudioFileViewModel, promptViewModel: PromptViewModel) {
     NavHost(
         navController = navController,
         startDestination = com.example.aday2dream.navigation.Screen.Login.route
     ) {
-        // Login Screen
+
         composable(com.example.aday2dream.navigation.Screen.Login.route) {
             LoginScreen(
                 onNavigateToRegister = { navController.navigate(com.example.aday2dream.navigation.Screen.Register.route) },
@@ -32,7 +34,6 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             )
         }
 
-        // Register Screen
         composable(com.example.aday2dream.navigation.Screen.Register.route) {
             RegisterScreen(
                 onNavigateBack = { navController.popBackStack() },
@@ -47,8 +48,6 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             )
         }
 
-
-        // Home Screen
         composable(com.example.aday2dream.navigation.Screen.Home.route) {
             HomeScreen(
                 navigateToPost = { postId ->
@@ -84,7 +83,6 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                         navController = navController
                     )
                 } else {
-                    // Handle the case where postId is null
                     Log.e("Navigation", "Post ID is null!")
                 }
             }
@@ -117,6 +115,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 accountViewModel = accountViewModel
             )
         }
+
         composable(route = com.example.aday2dream.navigation.Screen.EditPost.route,
             arguments = listOf(navArgument("postId") { type = NavType.LongType })
         ) { backStackEntry ->
@@ -129,35 +128,39 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                     onNavigateBack = { navController.popBackStack() }
                 )
             } else {
-                // Handle the case where postId is null
                 Log.e("Navigation", "Post ID is null!")
             }
         }
-    }
-}
 
-
-
-    /*
-        // Add Post Screen
-
-
-        // Profile Screen
-
-
-        // Add Prompt Screen
-        composable(Screen.AddPrompt.route) {
-            AddPromptScreen(
-                onPromptAdded = { navController.popBackStack() }
-            )
+        composable(route = com.example.aday2dream.navigation.Screen.AddPrompt.route,
+            arguments = listOf(navArgument("postId") { type = NavType.LongType })
+            ) {
+                backStackEntry ->
+            val postId = backStackEntry.arguments?.getLong("postId")
+            if (postId != null) {
+                AddPromptScreen(
+                    onPromptAdded = { navController.popBackStack() },
+                    promptViewModel = promptViewModel,
+                    accountViewModel = accountViewModel,
+                    postViewModel = postViewModel,
+                    postId = postId
+                )
+            }
         }
-
-        // Prompt Details Screen
-        composable(Screen.Prompt.route) {
+        composable(com.example.aday2dream.navigation.Screen.Prompt.route) {
             PromptScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
     }
+
 }
-*/
+}
+
+}
+
+
+
+
+
+

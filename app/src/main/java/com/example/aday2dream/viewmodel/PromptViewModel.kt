@@ -1,0 +1,65 @@
+package com.example.aday2dream.viewmodel
+
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.aday2dream.model.dto.PromptDto
+import com.example.aday2dream.model.repository.PromptRepository
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class PromptViewModel(private val promptRepository: PromptRepository) : ViewModel() {
+
+    private val _prompt = MutableStateFlow<PromptDto?>(null)
+    val prompt: StateFlow<PromptDto?> get() = _prompt
+
+    @SuppressLint("NewApi")
+    fun createPrompt(
+        postId: Long,
+        buyerId: Long,
+        promptTitle: String,
+        promptDescription: String,
+        hyperlinks: String,
+        startDate: String,
+        endDate: String?,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val prompt = PromptDto(
+                    promptTitle = promptTitle,
+                    promptDescription = promptDescription,
+                    promptLinks = hyperlinks,
+                    postId = postId,
+                    buyerId = buyerId,
+                    startDate = startDate,
+                    endDate = endDate,
+                )
+                val jsonData = Gson().toJson(prompt)
+                Log.d("Prompt ViewModel", jsonData)
+                val response = promptRepository.createPrompt(prompt)
+                Log.d("Prompt ViewModel", response.toString())
+                if (response.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        onSuccess("Prompt created Successfully!")
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        onError("Failed to create prompt: ${response.message() ?: "Unknown error"}")
+                    }
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onError("Error: ${e.localizedMessage}")
+                }
+            }
+        }
+    }
+}

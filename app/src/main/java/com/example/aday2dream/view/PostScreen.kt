@@ -115,6 +115,14 @@ fun PostScreen(
                         Text("Play Audio")
                     }
                 }
+                Button(
+                    onClick = {
+                        navController.navigate("addPrompt/${post.postId}")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Create Prompt")
+                }
             }
         } else {
             Box(

@@ -106,7 +106,7 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
                 Text(stringResource(R.string.login_button_text));
             }
 
-            RegisterTextButton(onClick = {onNavigateToRegister()})
+            RegisterTextButton(onNavigateToRegister = { onNavigateToRegister() } )
 
             when (loginState) {
                 is LoginState.Loading -> CircularProgressIndicator()
@@ -179,7 +179,7 @@ fun PasswordField(
 
 @SuppressLint("NewApi")
 @Composable
-fun RegisterTextButton(onClick: () -> Unit)
+fun RegisterTextButton(onNavigateToRegister: () -> Unit)
 {
     Row(){
         Text(
@@ -187,6 +187,7 @@ fun RegisterTextButton(onClick: () -> Unit)
         )
         Text(
             modifier = Modifier.clickable{
+                onNavigateToRegister()
             },
             text = stringResource(R.string.register_button_text),
             color = colorResource(R.color.purple_secondary)

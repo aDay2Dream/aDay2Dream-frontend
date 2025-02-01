@@ -1,7 +1,5 @@
 package com.example.aday2dream.model
 
-import android.net.Uri
-
 data class AudioFile (
     val audiofileId: Long,
     val uri: String,
