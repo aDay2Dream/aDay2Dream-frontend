@@ -3,21 +3,30 @@ package com.example.aday2dream.navigation
 import AddPromptScreen
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.aday2dream.view.*
-import com.example.aday2dream.viewmodel.AccountViewModel
-import com.example.aday2dream.viewmodel.AudioFileViewModel
-import com.example.aday2dream.viewmodel.PostViewModel
-import com.example.aday2dream.viewmodel.PromptViewModel
+import com.example.aday2dream.view.account.AccountScreen
+import com.example.aday2dream.view.account.EditAccountScreen
+import com.example.aday2dream.view.home.HomeScreen
+import com.example.aday2dream.view.login.LoginScreen
+import com.example.aday2dream.view.login.RegisterScreen
+import com.example.aday2dream.view.post.AddPostScreen
+import com.example.aday2dream.view.post.EditPostScreen
+import com.example.aday2dream.view.post.PostScreen
+import com.example.aday2dream.view.prompt.PromptScreen
+import com.example.aday2dream.view.prompt.ViewPromptScreen
+import com.example.aday2dream.viewmodel.account.AccountViewModel
+import com.example.aday2dream.viewmodel.audiofile.AudioFileViewModel
+import com.example.aday2dream.viewmodel.mail.MailViewModel
+import com.example.aday2dream.viewmodel.post.PostViewModel
+import com.example.aday2dream.viewmodel.prompt.PromptViewModel
 
 @Composable
-fun AppNavigation(navController: NavHostController, accountViewModel: AccountViewModel, postViewModel: PostViewModel, audioFileViewModel: AudioFileViewModel, promptViewModel: PromptViewModel) {
+fun AppNavigation(navController: NavHostController, accountViewModel: AccountViewModel, postViewModel: PostViewModel, audioFileViewModel: AudioFileViewModel, promptViewModel: PromptViewModel, mailViewModel: MailViewModel) {
     NavHost(
         navController = navController,
         startDestination = com.example.aday2dream.navigation.Screen.Login.route
@@ -25,9 +34,9 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
 
         composable(com.example.aday2dream.navigation.Screen.Login.route) {
             LoginScreen(
-                onNavigateToRegister = { navController.navigate(com.example.aday2dream.navigation.Screen.Register.route) },
+                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onLoginSuccess = {
-                    navController.navigate(com.example.aday2dream.navigation.Screen.Home.route)
+                    navController.navigate(Screen.Home.route)
                 },
                 viewModel = accountViewModel
 
@@ -38,8 +47,8 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             RegisterScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onRegisterSuccess = {
-                    navController.navigate(com.example.aday2dream.navigation.Screen.Login.route) {
-                        popUpTo(com.example.aday2dream.navigation.Screen.Register.route) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Register.route) {
                             inclusive = true
                         }
                     }
@@ -52,13 +61,13 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             HomeScreen(
                 navigateToPost = { postId ->
                     navController.navigate(
-                        com.example.aday2dream.navigation.Screen.Post.createRoute(
+                        Screen.Post.createRoute(
                             postId
                         )
                     )
                 },
-                navigateToAddPost = { navController.navigate(com.example.aday2dream.navigation.Screen.AddPost.route) },
-                navigateToProfile = { navController.navigate(com.example.aday2dream.navigation.Screen.Profile.route) },
+                navigateToAddPost = { navController.navigate(Screen.AddPost.route) },
+                navigateToProfile = { navController.navigate(Screen.Profile.route) },
                 viewModel = postViewModel
             )
         }
@@ -80,7 +89,9 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                     PostScreen(
                         postId = postId,
                         postViewModel = postViewModel,
-                        navController = navController
+                        navController = navController,
+                        accountViewModel = accountViewModel,
+                        audioFileViewModel = audioFileViewModel
                     )
                 } else {
                     Log.e("Navigation", "Post ID is null!")
@@ -101,14 +112,23 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                             postId
                         )
                     )
-                }
+                },
+                onViewPrompt = {
+                        promptId ->
+                    navController.navigate(
+                        com.example.aday2dream.navigation.Screen.ViewPrompt.createRoute(
+                            promptId
+                        )
+                    )
+                },
+                promptViewModel = promptViewModel
             )
         }
         composable(com.example.aday2dream.navigation.Screen.EditAccount.route) {
             EditAccountScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateLogin = {
-                    navController.navigate(com.example.aday2dream.navigation.Screen.Login.route) {
+                    navController.navigate(Screen.Login.route) {
                         popUpTo(0)
                     }
                 },
@@ -147,16 +167,35 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 )
             }
         }
-        composable(com.example.aday2dream.navigation.Screen.Prompt.route) {
-            PromptScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
+        composable(route = com.example.aday2dream.navigation.Screen.ViewPrompt.route,
+            arguments = listOf(navArgument("postId") { type = NavType.LongType })) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getLong("postId")
+
+            if (postId != null) {
+                ViewPromptScreen(
+                    postId = postId,
+                    promptViewModel = promptViewModel,
+                    navController = navController
+                )
+            }
+        }
+
+        composable(route = com.example.aday2dream.navigation.Screen.Prompt.route,
+                arguments = listOf(navArgument("promptId") { type = NavType.LongType })) { backStackEntry ->
+                    val promptId = backStackEntry.arguments?.getLong("promptId")
+
+            if (promptId != null) {
+                PromptScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    promptId = promptId,
+                    promptViewModel = promptViewModel,
+                    accountViewModel = accountViewModel,
+                    mailViewModel = mailViewModel,
+                    context = LocalContext.current
+                )
+            }
         }
     }
-
-}
-}
-
 }
 
 

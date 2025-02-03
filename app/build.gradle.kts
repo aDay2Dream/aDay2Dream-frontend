@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.accessibility.test.framework)
     implementation("androidx.compose.runtime:runtime-livedata:1.7.6")
+    implementation("androidx.test.services:storage:1.4.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

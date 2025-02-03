@@ -31,5 +31,20 @@ class PromptRepository(
         return response
     }
 
+    suspend fun getPromptsByAccountId(accountId: Long) : Response<List<PromptDto>> {
+        Log.d("Prompt Repository", "Entered Prompt Repository")
+        val response = apiService.getPromptsByAccountId("Bearer ${dataStore.data
+            .map { it[AUTH_TOKEN] }
+            .first()}", accountId = accountId)
+        Log.d("Prompt Repository", response.body().toString())
+        return response
+    }
 
+    suspend fun getPromptsByPostId(postId: Long) : Response<List<PromptDto>>{
+        val response = apiService.getPromptsByPostId("Bearer ${dataStore.data
+            .map { it[AUTH_TOKEN] }
+            .first()}", postId = postId)
+        Log.d("Prompt Repository", response.body().toString())
+        return response
+    }
 }

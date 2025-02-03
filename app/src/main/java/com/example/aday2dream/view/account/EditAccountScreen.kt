@@ -1,4 +1,4 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.account
 
 import android.util.Log
 import androidx.compose.runtime.livedata.observeAsState
@@ -16,9 +16,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.aday2dream.R
-import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.viewmodel.account.AccountViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +58,6 @@ fun EditAccountScreen(
                 style = TextStyle(fontSize = 18.sp, color = Color.Black)
             )
 
-            // Editable fields
             BasicTextField(
                 value = firstName,
                 onValueChange = { firstName = it },
@@ -100,7 +98,6 @@ fun EditAccountScreen(
                     .padding(8.dp)
             )
 
-            // Buttons
             Button(
                 onClick = {
                     profile?.let {

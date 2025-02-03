@@ -1,4 +1,4 @@
-package com.example.aday2dream.viewmodel
+package com.example.aday2dream.viewmodel.account
 
 import android.util.Log
 import androidx.datastore.preferences.core.edit
@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.aday2dream.model.dto.AccountLoginDto
 import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
-import com.example.aday2dream.model.Account
 import com.example.aday2dream.model.api.RetrofitClient
 import com.example.aday2dream.model.dto.AccountDto
 import com.example.aday2dream.model.repository.AccountRepository
@@ -28,6 +27,7 @@ import retrofit2.HttpException
 class AccountViewModel(val repository: AccountRepository) : ViewModel() {
     private var loginResponse: String? = null
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
+
     val loginState: StateFlow<LoginState> get() = _loginState
     private var registerResponse: String? = null
 
@@ -36,6 +36,9 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
 
     private val _profile = MutableLiveData<AccountDto?>()
     val profile: MutableLiveData<AccountDto?> get() = _profile
+
+    private val _account = MutableLiveData<AccountDto?>()
+    val account: MutableLiveData<AccountDto?> get() = _account
 
     private val _error = MutableLiveData<String>()
     val error: MutableLiveData<String> get() = _error
@@ -78,10 +81,9 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
                     if (!token.isNullOrEmpty()) {
                         println("Login successful")
                         _loginState.value = LoginState.Success(token)
-                        withContext(Dispatchers.Main){
+                        withContext(Dispatchers.Main) {
                             onResult(null, token)
                         }
-                         // Login successful, return token
                     } else {
                         _loginState.value = LoginState.Error("Token not found.")
                         withContext(Dispatchers.Main) {
@@ -113,7 +115,7 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val accountDto = Account(
+                val accountDto = AccountDto(
                     username = username,
                     email = email,
                     firstName = firstName,
@@ -121,7 +123,6 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
                     password = password
                 )
 
-                // Pass password as a query parameter
                 val response = RetrofitClient.api.register(accountDto)
                 Log.d("Registration", response.toString())
                 if (response.isSuccessful) {
@@ -172,7 +173,7 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val updatedProfile = repository.updateProfile(accountId,
-                    Account(
+                    AccountDto(
                         firstName = firstName,
                         lastName = lastName,
                         email = email,
@@ -188,6 +189,16 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
         }
     }
 
+    fun getAccountById(accountId: Long) {
+        viewModelScope.launch{
+              try {
+                val accountById = repository.getAccountById(accountId)
+                if(accountById != null) account.postValue(accountById)
+            } catch (e: Exception) {
+                Log.e("AccountViewModel", "Error getting account by Id: ${e.message}")
+            }
+        }
+    }
 
     fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {

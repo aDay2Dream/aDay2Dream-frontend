@@ -1,4 +1,4 @@
-package com.example.aday2dream.viewmodel
+package com.example.aday2dream.viewmodel.post
 
 import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -8,10 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
-import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.dto.PostDto
-import com.example.aday2dream.model.dto.AccountDto
-import com.example.aday2dream.model.dto.AudioFileDto
 import com.example.aday2dream.model.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +19,8 @@ import java.math.BigDecimal
 
 
 class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
-    private val _posts = MutableLiveData<List<Post>>()
-    val posts: MutableLiveData<List<Post>> get() = _posts
+    private val _posts = MutableLiveData<List<PostDto>>()
+    val posts: MutableLiveData<List<PostDto>> get() = _posts
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
@@ -31,11 +28,8 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
     private val dataStore = App.appContext.dataStore
     val KEY_AUTH_TOKEN = stringPreferencesKey("auth_token")
 
-    private val _post = MutableStateFlow<Post?>(null)
-    val post: StateFlow<Post?> get() = _post
-
-
-
+    private val _post = MutableStateFlow<PostDto?>(null)
+    val post: StateFlow<PostDto?> get() = _post
 
     fun fetchPosts() {
         viewModelScope.launch {
@@ -44,9 +38,14 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
                 val response = postRepository.fetchPosts()
                 Log.d("Post View Model", response.toString())
                 if (response.isSuccessful) {
-                    Log.d("Post View Model", response.body().toString())
-                    _posts.postValue(response.body())
-
+                    if(response.code() == 204)
+                    {
+                        _posts.postValue(emptyList())
+                    }
+                    else {
+                        Log.d("Post View Model", response.body().toString())
+                        _posts.postValue(response.body())
+                    }
                 } else {
                     _error.postValue("Error fetching posts: ${response.message()}")
                     Log.d("Post View Model", "Error fetching posts: ${response.message()}")
@@ -63,21 +62,21 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
         backgroundImage: String?,
         postDescription: String,
         price: BigDecimal,
-        audioFile: AudioFileDto,
-        account: AccountDto,
+        audiofileId: Long,
+        accountId: Long,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val post = backgroundImage?.let {
-                    Post(
+                    PostDto(
                         title = postTitle,
                         description = postDescription,
                         price = price,
-                        audiofile = audioFile,
+                        audiofileId = audiofileId,
                         backgroundImage = it,
-                        account = account
+                        accountId = accountId
                     )
                 }
                 Log.d("Post View Model", post.toString())
@@ -127,7 +126,7 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
 
         fun editPost(
             postId: Long,
-            updatedPost: Post,
+            updatedPost: PostDto,
             onSuccess: () -> Unit,
             onError: (String) -> Unit
         ) {
@@ -163,8 +162,6 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
             }
         }
     }
-
-
-    }
+}
 
 

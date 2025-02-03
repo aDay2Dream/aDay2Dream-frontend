@@ -1,8 +1,7 @@
-package com.example.aday2dream.viewmodel
+package com.example.aday2dream.viewmodel.post
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.aday2dream.model.repository.AccountRepository
 import com.example.aday2dream.model.repository.PostRepository
 
 class PostViewModelFactory(private val postRepository: PostRepository) : ViewModelProvider.Factory {

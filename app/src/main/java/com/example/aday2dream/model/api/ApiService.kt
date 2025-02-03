@@ -1,11 +1,29 @@
 package com.example.aday2dream.model.api
 
+import com.example.aday2dream.ACCOUNT_BY_ID
+import com.example.aday2dream.CREATE_POST
+import com.example.aday2dream.CREATE_PROMPT
+import com.example.aday2dream.GET_AUDIOFILE
+import com.example.aday2dream.GET_POSTS
+import com.example.aday2dream.GET_PROFILE
+import com.example.aday2dream.LOG_IN
+import com.example.aday2dream.LOG_OUT
+import com.example.aday2dream.POSTS_BY_ACCOUNT
+import com.example.aday2dream.POST_BY_ID
+import com.example.aday2dream.PROMPTS_BY_ACCOUNT_ID
+import com.example.aday2dream.PROMPTS_BY_POST_ID
+import com.example.aday2dream.PROMPT_BY_ID
+import com.example.aday2dream.REGISTER
+import com.example.aday2dream.SEND_EMAIL
+import com.example.aday2dream.UPDATE_POST
+import com.example.aday2dream.UPLOAD_AUDIOFILE
 import com.example.aday2dream.model.dto.AccountLoginDto
-import com.example.aday2dream.model.Account
-import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.dto.AccountDto
 import com.example.aday2dream.model.dto.AudioFileDto
+import com.example.aday2dream.model.dto.LoginResponseDto
+import com.example.aday2dream.model.dto.PostDto
 import com.example.aday2dream.model.dto.PromptDto
+import com.example.aday2dream.model.dto.RegisterResponseDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -14,31 +32,30 @@ import retrofit2.http.POST
 
 import retrofit2.http.*
 
-data class LoginResponse(val token: String)
-
-data class RegisterResponse(
-        val username: String,
-        val password: String,
-        val email: String,
-        val firstName: String,
-        val lastName: String
-)
-
 interface ApiService {
-        @POST("/accounts/login")
-        suspend fun login(@Body request: AccountLoginDto): Response<LoginResponse>
+        @POST(LOG_IN)
+        suspend fun login(@Body request: AccountLoginDto): Response<LoginResponseDto>
 
-        @POST("/accounts/register")
-        suspend fun register(@Body request: Account): Response<RegisterResponse>
+        @POST(REGISTER)
+        suspend fun register(@Body request: AccountDto): Response<RegisterResponseDto>
 
-        @GET("/accounts/profile")
+        @GET(GET_PROFILE)
         suspend fun getProfile(@Header("Authorization") authHeader: String): Response<AccountDto>
 
-        @GET("/posts")
-        suspend fun getPosts(@Header("Authorization") authHeader: String): Response<List<Post>>
+        @GET(ACCOUNT_BY_ID)
+        suspend fun getAccountById(@Header("Authorization") authHeader: String, @Path("id") accountId: Long): Response<AccountDto>
+
+        @PUT(ACCOUNT_BY_ID)
+        suspend fun updateAccount(@Header("Authorization") authHeader: String, @Path("id") accountId: Long, @Body account: AccountDto, @Query("password") password: String): Response<AccountDto>
+
+        @DELETE(ACCOUNT_BY_ID)
+        suspend fun deleteAccount(@Header("Authorization") authHeader: String): Response<Unit>
+
+        @POST(LOG_OUT)
+        suspend fun logoutAccount(@Header("Authorization") authHeader: String): Response<Unit>
 
         @Multipart
-        @POST("audiofiles/upload")
+        @POST(UPLOAD_AUDIOFILE)
         suspend fun uploadAudio(
                 @Header("Authorization") authHeader: String,
                 @Part file: MultipartBody.Part,
@@ -46,34 +63,47 @@ interface ApiService {
                 @Part("duration") duration: RequestBody
         ): Response<AudioFileDto>
 
-        @POST("/posts")
-        suspend fun createPost(@Header("Authorization") authHeader: String, @Body post: Post): Response<Void>
+        @GET(GET_AUDIOFILE)
+        suspend fun getAudioFileById(@Header("Authorization") authHeader: String, @Path("id") audioFileId: Long): AudioFileDto
 
-        @GET("posts/{id}")
-        suspend fun getPostById(@Header("Authorization") authHeader: String, @Path("id") postId: Long): Post
+        @POST(CREATE_POST)
+        suspend fun createPost(@Header("Authorization") authHeader: String, @Body post: PostDto): Response<Void>
 
-        @DELETE("/profile")
-        suspend fun deleteAccount(@Header("Authorization") authHeader: String): Response<Unit>
+        @GET(GET_POSTS)
+        suspend fun getPosts(@Header("Authorization") authHeader: String): Response<List<PostDto>>
 
-        @POST("/accounts/logout")
-        suspend fun logoutAccount(@Header("Authorization") authHeader: String): Response<Unit>
+        @GET(POST_BY_ID)
+        suspend fun getPostById(@Header("Authorization") authHeader: String, @Path("id") postId: Long): PostDto
 
-        @GET("/posts/account/{accountId}")
-        suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<Post>>
+        @GET(POSTS_BY_ACCOUNT)
+        suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<PostDto>>
 
-        @PUT("accounts/{id}")
-        suspend fun updateAccount(@Header("Authorization") authHeader: String,  @Path("id") accountId: Long, @Body account: Account, @Query("password") password: String): Response<AccountDto>
+        @PUT(UPDATE_POST)
+        suspend fun updatePost(@Header("Authorization") authHeader: String, @Path("id") postId: Long, @Body updatedPost: PostDto): Response<PostDto>
 
-        @PUT("posts/{id}")
-        suspend fun updatePost(@Header("Authorization") authHeader: String, @Path("id") postId: Long, @Body updatedPost: Post): Response<Post>
-
-        @DELETE("/posts/{id}")
+        @DELETE(POST_BY_ID)
         suspend fun deletePost(@Header("Authorization") authHeader: String, @Path("id") postId: Long): Response<Unit>
 
-        @GET("/prompts/{id}")
+        @GET(PROMPT_BY_ID)
         suspend fun getPromptById(@Header("Authorization") authHeader: String, @Path("id") promptId: Long): Response<PromptDto>
 
-        @POST("/prompts")
+        @GET(PROMPTS_BY_POST_ID)
+        suspend fun getPromptsByAccountId(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<PromptDto>>
+
+        @POST(CREATE_PROMPT)
         suspend fun createPrompt(@Header("Authorization") authHeader: String, @Body prompt: PromptDto): Response<PromptDto>
+
+        @GET(PROMPTS_BY_ACCOUNT_ID)
+        suspend fun getPromptsByPostId(@Header("Authorization") authHeader: String, @Path("postId") postId: Long): Response<List<PromptDto>>
+
+        @Multipart
+        @POST(SEND_EMAIL)
+        suspend fun sendMail(
+                @Header("Authorization") authHeader: String,
+                @Part("to") to: RequestBody,
+                @Part("subject") subject: RequestBody,
+                @Part("text") text: RequestBody,
+                @Part audioFile: MultipartBody.Part
+        ): Response<String>
 }
 

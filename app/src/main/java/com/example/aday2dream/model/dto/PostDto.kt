@@ -4,7 +4,7 @@ import java.math.BigDecimal
 
 
 data class PostDto(
-    val postId: Long,
+    val postId: Long? = null,
     val accountId: Long,
     val audiofileId: Long,
     val title: String,

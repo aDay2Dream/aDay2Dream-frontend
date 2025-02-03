@@ -8,9 +8,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.aday2dream.viewmodel.AccountViewModel
-import com.example.aday2dream.viewmodel.PostViewModel
-import com.example.aday2dream.viewmodel.PromptViewModel
+import com.example.aday2dream.viewmodel.account.AccountViewModel
+import com.example.aday2dream.viewmodel.post.PostViewModel
+import com.example.aday2dream.viewmodel.prompt.PromptViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

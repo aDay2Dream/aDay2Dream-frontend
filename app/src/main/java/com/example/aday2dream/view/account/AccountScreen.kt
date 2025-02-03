@@ -1,4 +1,4 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.account
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -15,11 +15,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.livedata.observeAsState
-import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.dto.AccountDto
 import com.example.aday2dream.model.dto.PostDto
-import com.example.aday2dream.viewmodel.AccountViewModel
-import com.example.aday2dream.viewmodel.PostViewModel
+import com.example.aday2dream.model.dto.PromptDto
+import com.example.aday2dream.viewmodel.account.AccountViewModel
+import com.example.aday2dream.viewmodel.post.PostViewModel
+import com.example.aday2dream.viewmodel.prompt.PromptViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,19 +29,28 @@ fun AccountScreen(
     onNavigateBack: () -> Unit,
     onEditInfo: () -> Unit,
     onEditPost: (postId: Long) -> Unit,
+    onViewPrompt: (promptId: Long) -> Unit,
     accountViewModel: AccountViewModel,
-    postViewModel: PostViewModel
+    postViewModel: PostViewModel,
+    promptViewModel: PromptViewModel
 ) {
 
     val profile by accountViewModel.profile.observeAsState()
     val posts by postViewModel.posts.observeAsState(emptyList())
+    val prompts by promptViewModel.prompts.observeAsState(emptyList())
     val error by accountViewModel.error.observeAsState()
-
 
     LaunchedEffect(Unit) {
         accountViewModel.fetchProfile()
-        profile?.let { it.accountId?.let { it1 -> postViewModel.fetchPostsByAccount(it1) } } // Fetch posts made by this account
+        profile?.let {
+            it.accountId?.let { accountId ->
+                postViewModel.fetchPostsByAccount(accountId)
+                promptViewModel.getPromptsByAccountId(accountId)
+            }
+        }
     }
+    Log.d("Account Screen", "{${prompts.toString()}}")
+    Log.d("Account Screen", posts.toString())
 
     Scaffold(
         topBar = {
@@ -62,21 +72,27 @@ fun AccountScreen(
                     .background(Color.White)
             ) {
                 profile?.let { account ->
-                    AccountDetails(
-                        account = account,
-                        posts = posts,
-                        onEditInfo = onEditInfo,
-                        onLogoutAccount = {
-                            accountViewModel.logoutAccount(
-                                onSuccess = {
-                                    onNavigateLogin() },
-                                onError = {}
-                            )
-                        },
-                        onEditPost = onEditPost,
-                        postViewModel = postViewModel,
-                        onNavigateBack = onNavigateBack
-                    )
+                    prompts?.let {
+                        AccountDetails(
+                            account = account,
+                            posts = posts,
+                            prompts = it,
+                            onEditInfo = onEditInfo,
+                            onLogoutAccount = {
+                                accountViewModel.logoutAccount(
+                                    onSuccess = {
+                                        onNavigateLogin()
+                                    },
+                                    onError = {}
+                                )
+                            },
+                            onEditPost = onEditPost,
+                            onViewPrompt = onViewPrompt,
+                            postViewModel = postViewModel,
+                            promptViewModel = promptViewModel,
+                            onNavigateBack = onNavigateBack
+                        )
+                    }
                 } ?: error?.let {
                     Text(
                         text = error.toString(),
@@ -89,12 +105,16 @@ fun AccountScreen(
     )
 }
 
+
 @Composable
 fun AccountDetails(
     postViewModel: PostViewModel,
+    promptViewModel: PromptViewModel,
     account: AccountDto,
-    posts: List<Post>,
+    posts: List<PostDto>,
+    prompts: List<PromptDto>,
     onEditPost: (postId: Long) -> Unit,
+    onViewPrompt: (promptId: Long) -> Unit,
     onEditInfo: () -> Unit,
     onLogoutAccount: () -> Unit,
     onNavigateBack: () -> Unit
@@ -105,7 +125,7 @@ fun AccountDetails(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Profile Information
+
         Text(text = "Profile Information", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Username: ${account.username}")
@@ -115,7 +135,6 @@ fun AccountDetails(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -124,31 +143,45 @@ fun AccountDetails(
                 Text("Edit Info")
             }
             Button(onClick = onLogoutAccount, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
-            Text("Log Out")
-        }
-
+                Text("Log Out")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Posts Section
         Text(text = "Your Posts", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
         if (posts.isNotEmpty()) {
             LazyColumn {
                 items(posts) { post ->
-                    EditPostItem(post = post, onEditPost, postViewModel = postViewModel, onNavigateBack = onNavigateBack)
+                    EditPostItem(post = post, onEditPost, postViewModel = postViewModel, onNavigateBack = onNavigateBack, onViewPrompt = onViewPrompt)
                 }
             }
         } else {
             Text(text = "No posts available.", modifier = Modifier.padding(16.dp))
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Your Prompts", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (prompts.isNotEmpty()) {
+            LazyColumn {
+                items(prompts) { prompt ->
+                    PromptItem(prompt = prompt, onViewPrompt)
+                }
+            }
+        } else {
+            Text(text = "No prompts available.", modifier = Modifier.padding(16.dp))
+        }
     }
 }
 
+
 @Composable
-fun EditPostItem(post: Post, onEditPost: (postId: Long) -> Unit, postViewModel: PostViewModel, onNavigateBack: () -> Unit) {
+fun EditPostItem(post: PostDto, onEditPost: (postId: Long) -> Unit, onViewPrompt: (postId: Long) -> Unit, postViewModel: PostViewModel, onNavigateBack: () -> Unit) {
     Log.d("Edit Post Item", post.postId.toString())
     val error by remember {mutableStateOf("")}
 
@@ -156,13 +189,13 @@ fun EditPostItem(post: Post, onEditPost: (postId: Long) -> Unit, postViewModel: 
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable(onClick = { post.postId?.let { onEditPost(it) } }),
+            .clickable(onClick = { post.postId?.let { onViewPrompt(post.postId) } }),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = post.title, style = MaterialTheme.typography.titleMedium)
             Text(text = post.description, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = { post.postId?.let { onEditPost(it) } }, colors = ButtonDefaults.buttonColors(containerColor = Color.White)){
+            Button(onClick = { post.postId?.let { onEditPost(post.postId) } }, colors = ButtonDefaults.buttonColors(containerColor = Color.White)){
                 Text("Edit Post")
             }
             Button(onClick = { post.postId?.let {
@@ -176,3 +209,23 @@ fun EditPostItem(post: Post, onEditPost: (postId: Long) -> Unit, postViewModel: 
         }
     }
 }
+
+@Composable
+fun PromptItem(prompt: PromptDto, onViewPrompt: (promptId: Long) -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable(onClick = { prompt.promptId?.let { onViewPrompt(it) } }),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = prompt.promptTitle, style = MaterialTheme.typography.titleMedium)
+            Text(text = prompt.promptDescription, style = MaterialTheme.typography.bodyMedium)
+            Button(onClick = { prompt.promptId?.let { onViewPrompt(it) } }, colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
+                Text("View Prompt")
+            }
+        }
+    }
+}
+

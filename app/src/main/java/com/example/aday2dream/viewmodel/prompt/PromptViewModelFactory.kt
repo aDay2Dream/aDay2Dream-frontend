@@ -1,8 +1,7 @@
-package com.example.aday2dream.viewmodel
+package com.example.aday2dream.viewmodel.prompt
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.aday2dream.model.repository.PostRepository
 import com.example.aday2dream.model.repository.PromptRepository
 
 class PromptViewModelFactory(private val promptRepository: PromptRepository) : ViewModelProvider.Factory {

@@ -1,4 +1,4 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.login
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -40,15 +40,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.R
-import com.example.aday2dream.model.Account
+import com.example.aday2dream.model.dto.AccountDto
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(onNavigateBack: () -> Unit, onRegisterSuccess: () -> Unit, viewModel: AccountViewModel) {
-    var account by remember { mutableStateOf(Account()) }
+    var account by remember { mutableStateOf(AccountDto()) }
     var isLoading by remember { mutableStateOf(false) }
     var registrationMessage by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }

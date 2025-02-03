@@ -1,4 +1,4 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.post
 
 import android.annotation.SuppressLint
 import android.net.Uri
@@ -37,9 +37,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.aday2dream.R
-import com.example.aday2dream.viewmodel.AccountViewModel
-import com.example.aday2dream.viewmodel.AudioFileViewModel
-import com.example.aday2dream.viewmodel.PostViewModel
+import com.example.aday2dream.viewmodel.account.AccountViewModel
+import com.example.aday2dream.viewmodel.audiofile.AudioFileViewModel
+import com.example.aday2dream.viewmodel.post.PostViewModel
 import java.math.BigDecimal
 
 
@@ -62,7 +62,7 @@ fun AddPostScreen(
     var message by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    // Launcher for picking audio files
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -77,10 +77,6 @@ fun AddPostScreen(
     LaunchedEffect(Unit) {
         accountViewModel.fetchProfile()
     }
-
-
-
-
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = SnackbarHostState()) },
@@ -105,7 +101,6 @@ fun AddPostScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Input fields for post details
             OutlinedTextField(
                 value = postTitle,
                 onValueChange = { postTitle = it },
@@ -135,7 +130,6 @@ fun AddPostScreen(
                 Text("Select Audio File")
             }
 
-            // Audio file details (if selected)
             if (fileUri != null) {
                 OutlinedTextField(
                     value = audioTitle,
@@ -161,21 +155,23 @@ fun AddPostScreen(
                         duration = audioDuration,
                         onSuccess = { uploadedAudio ->
                             Log.d("onSuccess uploadAudio", uploadedAudio.toString())
-                            postViewModel.createPost(
-                                postTitle = postTitle,
-                                postDescription = postDescription,
-                                price = price.toBigDecimalOrNull() ?: BigDecimal.ZERO,
-                                audioFile = uploadedAudio,
-                                account = profile!!,
-                                backgroundImage = "",
-                                onSuccess = {
-                                    message = "Post created successfully!"
-                                    onPostCreated()
-                                },
-                                onError = { err ->
-                                    message = err
-                                }
-                            )
+                            profile!!.accountId?.let {
+                                postViewModel.createPost(
+                                    postTitle = postTitle,
+                                    postDescription = postDescription,
+                                    price = price.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                                    audiofileId = uploadedAudio.audiofileId,
+                                    accountId = it,
+                                    backgroundImage = "",
+                                    onSuccess = {
+                                        message = "Post created successfully!"
+                                        onPostCreated()
+                                    },
+                                    onError = { err ->
+                                        message = err
+                                    }
+                                )
+                            }
                         },
                         onError = { err ->
                             message = err
