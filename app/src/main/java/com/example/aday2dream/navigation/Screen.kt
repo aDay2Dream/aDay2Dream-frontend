@@ -6,10 +6,29 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object AddPost : Screen("addPost")
     object Profile : Screen("profile")
-    object AddPrompt : Screen("addPrompt")
-    object Prompt : Screen("prompt")
+    object EditAccount: Screen("editAccount")
 
     object Post : Screen("post/{postId}") {
-        fun createRoute(postId: String) = "post/$postId"
+        fun createRoute(postId: Long) = "post/$postId"
     }
+
+    object EditPost : Screen("editPost/{postId}")
+    {
+        fun createRoute(postId: Long) = "editPost/$postId"
+    }
+
+    object AddPrompt: Screen("addPrompt/{postId}") {
+        fun createRoute(postId: Long) = "addPrompt/$postId"
+    }
+
+    object Prompt: Screen("prompt/{promptId}")
+    {
+        fun createRoute(promptId: Long) = "prompt/$promptId"
+    }
+
+    object ViewPrompt: Screen("viewPrompt/{postId}")
+    {
+        fun createRoute(postId: Long) = "viewPrompt/$postId"
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.aday2dream.viewmodel
+package com.example.aday2dream.viewmodel.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

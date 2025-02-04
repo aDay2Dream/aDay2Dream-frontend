@@ -1,5 +1,8 @@
 package com.example.aday2dream.model.api
 
+import com.example.aday2dream.BASE_URL
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -11,8 +14,8 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
+
 object RetrofitClient {
-    private const val BASE_URL = "https://192.168.88.20:8443"
     private var authToken : String = ""
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -66,10 +69,19 @@ object RetrofitClient {
             throw RuntimeException(e)
         }
     }
+
+    private fun createGson(): Gson {
+        return GsonBuilder()
+            .apply {
+                setLenient()
+            }
+            .create()
+    }
+
     val api: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(createGson()))
             .client(getUnsafeOkHttpClient())
             .build()
             .create(ApiService::class.java)

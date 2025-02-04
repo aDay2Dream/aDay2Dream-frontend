@@ -1,6 +1,7 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.home
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,22 +34,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
-import com.example.aday2dream.viewmodel.AccountViewModel
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.example.aday2dream.R
-import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.dto.PostDto
-import com.example.aday2dream.viewmodel.PostViewModel
+import com.example.aday2dream.viewmodel.post.PostViewModel
 
 
 
@@ -62,9 +63,10 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
     LaunchedEffect(Unit) {
         viewModel.fetchPosts()
     }
+
     val scrollState = rememberScrollState()
     Scaffold(modifier = Modifier.background(colorResource(R.color.pink_secondary)),
-        /*topBar = {
+        topBar = {
             TopAppBar(
                 modifier = Modifier.clip(
                     RoundedCornerShape(20.dp)).border(width = 2.dp, color = colorResource(R.color.purple_main), shape = RoundedCornerShape(20.dp))
@@ -87,7 +89,6 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
 
         },
 
-         */
         bottomBar = {
             BottomAppBar(
                 modifier = Modifier.height(120.dp)
@@ -128,7 +129,7 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
                         )
                     }
                     IconButton(onClick = {
-                        navigateToAddPost()
+                        navigateToProfile()
                     }) {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
@@ -143,23 +144,27 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
         }
     )
     { innerPadding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-            items(posts) { post ->
-                Log.d("Home Page", "{$post}")
-                PostItem(post, navigateToPost = navigateToPost)
+        if (posts.isEmpty()) {
+            Text("There are no posts yet", modifier = Modifier.padding(16.dp))
+        } else {
+            LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                items(posts) { post ->
+                    Log.d("Home Page", "{$post}")
+                    PostItem(post, navigateToPost = navigateToPost)
+                }
             }
         }
-
     }
 }
-
     @Composable
     fun PostItem(post: PostDto, navigateToPost: (postId: Long) -> Unit) {
+        Log.d("Post Item", "postId: {${post.postId}}")
         Card(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).padding(10.dp)
                 .height(120.dp).clickable {
-                    navigateToPost(post.id)
-            }) {
+                    post.postId?.let { navigateToPost(it) } ?: Log.e("PostItem", "Post ID is null")
+
+                }) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             )

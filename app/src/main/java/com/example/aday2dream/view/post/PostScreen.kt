@@ -1,6 +1,6 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.post
 
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
@@ -28,31 +28,47 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.aday2dream.viewmodel.PostViewModel
+import com.example.aday2dream.viewmodel.post.PostViewModel
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.example.aday2dream.model.dto.AudioFileDto
+import com.example.aday2dream.viewmodel.account.AccountViewModel
+import com.example.aday2dream.viewmodel.audiofile.AudioFileViewModel
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
-    postId: String,
+    postId: Long,
     postViewModel: PostViewModel,
+    accountViewModel: AccountViewModel,
+    audioFileViewModel: AudioFileViewModel,
     navController: NavController
 ) {
     val postState by postViewModel.post.collectAsState(initial = null)
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
+    val account by accountViewModel.account.observeAsState()
+    var audioFile by remember { mutableStateOf<AudioFileDto?>(null) }
+
+
+    LaunchedEffect(postId) {
         postViewModel.getPostById(postId)
+    }
+
+    LaunchedEffect(postState) {
+        postState?.let { post ->
+            accountViewModel.getAccountById(post.accountId)
+            audioFile = audioFileViewModel.getAudioFileById(post.audiofileId)
+        }
     }
 
     Scaffold(
@@ -68,7 +84,7 @@ fun PostScreen(
             )
         }
     ) { paddingValues ->
-        if (postState != null) {
+        if (postState != null && account != null && audioFile != null) {
             val post = postState!!
             Column(
                 modifier = Modifier
@@ -82,7 +98,7 @@ fun PostScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = "By: ${post.account.username}",
+                    text = "By: ${account!!.username}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -98,21 +114,28 @@ fun PostScreen(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                if (post.audiofile != null) {
+                if (audioFile != null) {
                     Text(
-                        text = "Audio: ${post.audiofile.title}",
+                        text = "Audio: ${audioFile!!.title}",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Button(
                         onClick = {
-                            // Play audio logic
-                            playAudio(context, post.audiofile.uri)
+                            playAudio(context, audioFile!!.uri)
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Play Audio")
                     }
+                }
+                Button(
+                    onClick = {
+                        navController.navigate("addPrompt/${post.postId}")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Create Prompt")
                 }
             }
         } else {

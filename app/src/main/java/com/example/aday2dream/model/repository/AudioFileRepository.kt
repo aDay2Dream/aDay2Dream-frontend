@@ -1,10 +1,10 @@
 package com.example.aday2dream.model.repository
 
+import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.protobuf.Api
 import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
-import com.example.aday2dream.model.AudioFile
 import com.example.aday2dream.model.api.ApiService
 import com.example.aday2dream.model.dto.AudioFileDto
 import kotlinx.coroutines.flow.first
@@ -30,5 +30,17 @@ class AudioFileRepository(private val api: ApiService) {
             .map { it[AUTH_TOKEN] }
             .first()}",file, title, duration)
     }
+
+    suspend fun getAudioFileById(audioFileId: Long): AudioFileDto? {
+        return try {
+            api.getAudioFileById(authHeader = "Bearer ${dataStore.data
+                .map { it[AUTH_TOKEN] }
+                .first()}", audioFileId)
+        } catch (e: Exception) {
+            Log.e("AudioFileRepository", "Error fetching audio file: ${e.message}")
+            null
+        }
+    }
+
 }
 

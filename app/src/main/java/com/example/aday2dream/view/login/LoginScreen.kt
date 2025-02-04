@@ -1,4 +1,4 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.login
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -15,13 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -33,7 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,9 +45,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.aday2dream.model.dto.AccountLoginDto
-import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.R
-import com.example.aday2dream.viewmodel.LoginState
+import com.example.aday2dream.viewmodel.account.LoginState
 
 
 @Composable
@@ -97,8 +93,8 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
                         Log.d("Login Button", errorMessage)
                     } else if (token != null) {
                         viewModel.saveAuthToken(token)
-                        Log.d("Login Button", "Token Saved")// Save the token
-                        onLoginSuccess() // Navigate to the profile page
+                        Log.d("Login Button", "Token Saved")
+                        onLoginSuccess()
                     }
                 }
             })
@@ -106,7 +102,7 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
                 Text(stringResource(R.string.login_button_text));
             }
 
-            RegisterTextButton(onClick = {onNavigateToRegister()})
+            RegisterTextButton(onNavigateToRegister = { onNavigateToRegister() } )
 
             when (loginState) {
                 is LoginState.Loading -> CircularProgressIndicator()
@@ -122,9 +118,6 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
     }
 }
 
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginField(
     value: String,
@@ -179,7 +172,7 @@ fun PasswordField(
 
 @SuppressLint("NewApi")
 @Composable
-fun RegisterTextButton(onClick: () -> Unit)
+fun RegisterTextButton(onNavigateToRegister: () -> Unit)
 {
     Row(){
         Text(
@@ -187,29 +180,10 @@ fun RegisterTextButton(onClick: () -> Unit)
         )
         Text(
             modifier = Modifier.clickable{
+                onNavigateToRegister()
             },
             text = stringResource(R.string.register_button_text),
             color = colorResource(R.color.purple_secondary)
         )
-    }
-}
-
-@Composable
-fun LabeledCheckbox(
-    label: String,
-    onCheckChanged: () -> Unit,
-    isChecked: Boolean
-) {
-
-    Row(
-        Modifier
-            .clickable(
-                onClick = onCheckChanged
-            )
-            .padding(4.dp)
-    ) {
-        Checkbox(checked = isChecked, onCheckedChange = null)
-        Spacer(Modifier.size(6.dp))
-        Text(label)
     }
 }

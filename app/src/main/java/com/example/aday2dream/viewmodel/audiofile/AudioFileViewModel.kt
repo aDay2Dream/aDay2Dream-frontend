@@ -1,18 +1,16 @@
-package com.example.aday2dream.viewmodel
+package com.example.aday2dream.viewmodel.audiofile
 
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore.Audio
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aday2dream.model.AudioFile
-import com.example.aday2dream.model.dto.AccountDto
 import com.example.aday2dream.model.dto.AudioFileDto
 import com.example.aday2dream.model.repository.AudioFileRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -34,11 +32,10 @@ class AudioFileViewModel(private val repository: AudioFileRepository) : ViewMode
     ) {
         viewModelScope.launch {
             try {
-
                 val fileDescriptor = context.contentResolver.openFileDescriptor(fileUri, "r") ?: return@launch
                 val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
 
-                val sanitizedTitle = title.replace("[^a-zA-Z0-9]".toRegex(), "_") // Replace invalid characters with underscores
+                val sanitizedTitle = title.replace("[^a-zA-Z0-9]".toRegex(), "_")
                 val fileName = "$sanitizedTitle.mp3"
                 val file = File(context.cacheDir, fileName)
 
@@ -46,23 +43,23 @@ class AudioFileViewModel(private val repository: AudioFileRepository) : ViewMode
                     inputStream.copyTo(outputStream)
                 }
 
-                // Prepare the file part
+
                 val requestFile = file.asRequestBody("audio/mpeg".toMediaTypeOrNull())
                 val filePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-                // Prepare the title and duration parts
+
                 val titlePart = title.toRequestBody("text/plain".toMediaTypeOrNull())
                 val durationPart = duration.toRequestBody("text/plain".toMediaTypeOrNull())
                 Log.d("Upload", titlePart.toString() )
                 Log.d(  "Upload", durationPart.toString() )
                 Log.d("Upload", filePart.toString())
-                // Make the API call
+
                 val response = repository.uploadAudio(filePart, titlePart, durationPart)
                 if (response.isSuccessful) {
                     val uploadedAudioFile = response.body() ?: return@launch
-                    _audiofile.postValue(uploadedAudioFile) // Store the actual AudioFile
+                    _audiofile.postValue(uploadedAudioFile)
                     onSuccess(uploadedAudioFile)
-                    Log.d("Upload", "Success: ${uploadedAudioFile.toString()}")
+                    Log.d("Upload", "Success: $uploadedAudioFile")
                 } else {
                     Log.d("Upload", response.toString())
                     Log.e("Upload", "Failed: ${response.message()}")
@@ -74,4 +71,11 @@ class AudioFileViewModel(private val repository: AudioFileRepository) : ViewMode
             }
         }
     }
+
+    fun getAudioFileById(audioFileId: Long): AudioFileDto? {
+        return runBlocking {
+            repository.getAudioFileById(audioFileId)
+        }
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.aday2dream.viewmodel
+package com.example.aday2dream.viewmodel.post
 
 import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -8,17 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
-import com.example.aday2dream.model.Post
 import com.example.aday2dream.model.dto.PostDto
-import com.example.aday2dream.model.api.RetrofitClient
-import com.example.aday2dream.model.dto.AccountDto
-import com.example.aday2dream.model.dto.AudioFileDto
 import com.example.aday2dream.model.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -26,7 +20,7 @@ import java.math.BigDecimal
 
 class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
     private val _posts = MutableLiveData<List<PostDto>>()
-    val posts: LiveData<List<PostDto>> get() = _posts
+    val posts: MutableLiveData<List<PostDto>> get() = _posts
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
@@ -34,26 +28,24 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
     private val dataStore = App.appContext.dataStore
     val KEY_AUTH_TOKEN = stringPreferencesKey("auth_token")
 
-    private val _post = MutableStateFlow<Post?>(null)
-    val post: StateFlow<Post?> get() = _post
-
-
+    private val _post = MutableStateFlow<PostDto?>(null)
+    val post: StateFlow<PostDto?> get() = _post
 
     fun fetchPosts() {
         viewModelScope.launch {
             try {
                 Log.d("Post View Model", "Entered try statement")
-                val response = RetrofitClient.api.getPosts(authHeader = "Bearer ${dataStore.data
-                    .map { it[KEY_AUTH_TOKEN] }
-                    .first()}")
-                dataStore.data
-                    .map { it[KEY_AUTH_TOKEN] }
-                    .first()?.let { Log.d("Post View Model", it) }
+                val response = postRepository.fetchPosts()
                 Log.d("Post View Model", response.toString())
                 if (response.isSuccessful) {
-                    Log.d("Post View Model", response.body().toString())
-                    _posts.postValue(response.body())
-
+                    if(response.code() == 204)
+                    {
+                        _posts.postValue(emptyList())
+                    }
+                    else {
+                        Log.d("Post View Model", response.body().toString())
+                        _posts.postValue(response.body())
+                    }
                 } else {
                     _error.postValue("Error fetching posts: ${response.message()}")
                     Log.d("Post View Model", "Error fetching posts: ${response.message()}")
@@ -70,21 +62,21 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
         backgroundImage: String?,
         postDescription: String,
         price: BigDecimal,
-        audioFile: AudioFileDto,
-        account: AccountDto,
+        audiofileId: Long,
+        accountId: Long,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val post = backgroundImage?.let {
-                    Post(
+                    PostDto(
                         title = postTitle,
                         description = postDescription,
                         price = price,
-                        audiofile = audioFile,
+                        audiofileId = audiofileId,
                         backgroundImage = it,
-                        account = account
+                        accountId = accountId
                     )
                 }
                 Log.d("Post View Model", post.toString())
@@ -108,7 +100,7 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
             }
         }
     }
-    fun getPostById(postId: String) {
+    fun getPostById(postId: Long) {
         viewModelScope.launch {
             try {
                 val fetchedPost = postRepository.getPostById(postId)
@@ -119,5 +111,57 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
         }
     }
 
+    fun fetchPostsByAccount(
+        accountId: Long
+    ) {
+        viewModelScope.launch {
+            try {
+                val accountPosts = postRepository.getPostsByAccountId(accountId)
+                _posts.postValue(accountPosts)
+            } catch (e: Exception) {
+                _error.postValue(e.localizedMessage)
+            }
+        }
+    }
+
+        fun editPost(
+            postId: Long,
+            updatedPost: PostDto,
+            onSuccess: () -> Unit,
+            onError: (String) -> Unit
+        ) {
+            viewModelScope.launch {
+                try {
+                    val response = postRepository.updatePost(postId, updatedPost)
+                    if (response.isSuccessful) {
+                        onSuccess()
+                    } else {
+                        onError("Failed to update post: ${response.message()}")
+                    }
+                } catch (e: Exception) {
+                    onError("Error occurred: ${e.localizedMessage}")
+                }
+            }
+        }
+
+    fun deletePost(
+        postId: Long,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = postRepository.deletePost(postId)
+                if (response.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onError("Failed to update post: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                onError("Error occurred: ${e.localizedMessage}")
+            }
+        }
+    }
 }
+
 

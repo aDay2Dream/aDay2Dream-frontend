@@ -1,4 +1,4 @@
-package com.example.aday2dream.view
+package com.example.aday2dream.view.login
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -40,15 +40,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.aday2dream.viewmodel.AccountViewModel
+import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.R
-import com.example.aday2dream.model.Account
+import com.example.aday2dream.model.dto.AccountDto
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(onNavigateBack: () -> Unit, onRegisterSuccess: () -> Unit, viewModel: AccountViewModel) {
-    var account by remember { mutableStateOf(Account()) }
+    var account by remember { mutableStateOf(AccountDto()) }
     var isLoading by remember { mutableStateOf(false) }
     var registrationMessage by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -92,18 +92,22 @@ fun RegisterScreen(onNavigateBack: () -> Unit, onRegisterSuccess: () -> Unit, vi
                 NameField(
                     value = account.firstName,
                     onChange = { data -> account = account.copy(firstName = data) },
-                    modifier = Modifier.width(150.dp)
+                    modifier = Modifier.width(150.dp),
+                    label = "First Name"
                 )
                 NameField(
                     value = account.lastName,
                     onChange = { data -> account = account.copy(lastName = data) },
-                    modifier = Modifier.width(150.dp)
+                    modifier = Modifier.width(150.dp),
+                    label = "Last Name"
+
                 )
             }
             NameField(
                 value = account.email,
                 onChange = { data -> account = account.copy(email = data) },
-                modifier = Modifier.width(150.dp)
+                modifier = Modifier.width(150.dp),
+                label = "E-mail"
             )
 
             LoginField(
@@ -178,7 +182,7 @@ fun NameField(
     value: String,
     onChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.username),
+    label: String,
 ) {
 
     val focusManager = LocalFocusManager.current
