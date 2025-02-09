@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -28,6 +28,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +38,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.aday2dream.R
+import com.example.aday2dream.view.Button
+import com.example.aday2dream.view.TextField
+import com.example.aday2dream.view.TopBar
 import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.viewmodel.audiofile.AudioFileViewModel
 import com.example.aday2dream.viewmodel.post.PostViewModel
@@ -81,72 +85,66 @@ fun AddPostScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = SnackbarHostState()) },
         topBar = {
-            TopAppBar(
-                title = {
-                    Image(
-                        painter = painterResource(R.drawable.logo_name),
-                        contentDescription = stringResource(R.string.logo_content_description)
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = colorResource(R.color.pink_secondary)
-                )
+            TopBar(
+                label = "Add post"
             )
-        }
+        },
+        containerColor = colorResource(R.color.pink_secondary)
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
+            TextField(
                 value = postTitle,
                 onValueChange = { postTitle = it },
-                label = { Text("Post Title") },
-                modifier = Modifier.fillMaxWidth()
+                label = "Post Title",
+                modifier = Modifier.width(300.dp)
             )
 
-            OutlinedTextField(
+            TextField(
                 value = postDescription,
                 onValueChange = { postDescription = it },
-                label = { Text("Post Description") },
-                modifier = Modifier.fillMaxWidth()
+                label = "Post Description",
+                modifier = Modifier.width(300.dp)
             )
 
-            OutlinedTextField(
+           TextField(
                 value = price,
                 onValueChange = { price = it },
-                label = { Text("Price") },
+                label = "Price",
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.width(300.dp)
             )
 
             Button(
+                text = "Select Audio File",
                 onClick = { launcher.launch("audio/*") },
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Select Audio File")
-            }
-
+            )
             if (fileUri != null) {
-                OutlinedTextField(
+               TextField(
                     value = audioTitle,
                     onValueChange = { audioTitle = it },
-                    label = { Text("Audio Title") },
-                    modifier = Modifier.fillMaxWidth()
+                    label = "Title",
+                    modifier = Modifier.width(300.dp)
                 )
 
-                OutlinedTextField(
+                TextField(
                     value = audioDuration,
                     onValueChange = { audioDuration = it },
-                    label = { Text("Audio Duration (e.g., 3:45)") },
-                    modifier = Modifier.fillMaxWidth()
+                    label = "Audio Duration (e.g., 3:45)",
+                    modifier = Modifier.width(300.dp)
                 )
             }
 
             Button(
+                modifier = Modifier.width(300.dp),
+                text = "Submit Post",
                 onClick = {
                     audioFileViewModel.uploadAudio(
                         context = context,
@@ -178,11 +176,7 @@ fun AddPostScreen(
                         }
                     )
         },
-
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Submit Post")
-            }
+            )
 
             if (message.isNotEmpty()) {
                 Text(

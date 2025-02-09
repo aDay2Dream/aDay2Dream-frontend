@@ -1,5 +1,6 @@
 package com.example.aday2dream.model.repository
 
+import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.aday2dream.App
 import com.example.aday2dream.dataStore
@@ -39,13 +40,17 @@ class PostRepository(private val api: ApiService) {
     }
 
     suspend fun getPostsByAccountId(accountId: Long): List<PostDto> {
+        Log.d("PostRepository", "Fetching posts for account: $accountId")
         val response = api.getPostsByAccount(
             authHeader = "Bearer ${dataStore.data
             .map { it[AUTH_TOKEN] }
             .first()}", accountId)
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
-        } else {
+        }
+        else if(response.code() == 404){
+            return emptyList()
+        }else{
             throw Exception("Failed to fetch posts: ${response.message()}")
         }
     }

@@ -84,7 +84,7 @@ class PromptViewModel(private val promptRepository: PromptRepository) : ViewMode
         viewModelScope.launch {
             try {
                 val result = promptRepository.getPromptsByAccountId(accountId)
-                _prompts.value = result.body()
+                _prompts.postValue(result.body())
             } catch (e: Exception) {
                 _error.value = "Error fetching prompt"
             }

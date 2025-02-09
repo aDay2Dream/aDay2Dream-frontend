@@ -8,6 +8,7 @@ import com.example.aday2dream.model.api.ApiService
 import com.example.aday2dream.model.dto.AccountDto
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import okhttp3.Response
 
 class AccountRepository(private val apiService: ApiService) {
     val AUTH_TOKEN = stringPreferencesKey("auth_token")
@@ -26,25 +27,25 @@ class AccountRepository(private val apiService: ApiService) {
         }
     }
 
-    suspend fun deleteAccount() {
+    suspend fun deleteAccount(accountId: Long) {
         val response = apiService.deleteAccount(authHeader = "Bearer ${
             dataStore.data
                 .map { it[AUTH_TOKEN] }
                 .first()
-        }")
+        }", accountId)
         if (!response.isSuccessful) {
             throw Exception("Failed to delete account: ${response.message()}")
         }
     }
 
-    suspend fun updateProfile(accountId: Long, account: AccountDto, password: String): AccountDto? {
+    suspend fun updateProfile(accountId: Long, account: AccountDto): AccountDto? {
 
         val response = apiService.updateAccount(
             authHeader = "Bearer ${
             dataStore.data
                 .map { it[AUTH_TOKEN] }
                 .first()
-        }", accountId, account, password)
+        }", accountId, account)
         if (response.isSuccessful) {
             return response.body()
         } else {
@@ -53,15 +54,13 @@ class AccountRepository(private val apiService: ApiService) {
     }
 
 
-    suspend fun logoutAccount() {
+    suspend fun logoutAccount(): String? {
         val response = apiService.logoutAccount(authHeader = "Bearer ${
             dataStore.data
                 .map { it[AUTH_TOKEN] }
                 .first()
         }")
-        if (!response.isSuccessful) {
-            throw Exception("Failed to logout of account: ${response.message()}")
-        }
+        return response.body()
     }
 
     suspend fun getAccountById(accountId: Long): AccountDto? {

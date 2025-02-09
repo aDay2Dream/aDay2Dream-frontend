@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
+
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -47,6 +47,9 @@ import androidx.compose.ui.unit.dp
 import com.example.aday2dream.model.dto.AccountLoginDto
 import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.R
+import com.example.aday2dream.view.Button
+import com.example.aday2dream.view.RegisterTextButton
+import com.example.aday2dream.view.TextField
 import com.example.aday2dream.viewmodel.account.LoginState
 
 
@@ -60,7 +63,8 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
     Scaffold(snackbarHost = {
         SnackbarHost(hostState = snackbarHostState)
     },
-        modifier = Modifier.background(colorResource(R.color.pink_secondary))){
+        containerColor = colorResource(R.color.pink_secondary)
+        ){
             innerPadding ->
         Column(
             modifier = Modifier
@@ -72,19 +76,24 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
         {
             Image(modifier = Modifier.size(150.dp, 150.dp), painter = painterResource(R.drawable.logo), contentDescription = stringResource(id = R.string.logo_content_description))
             Spacer(Modifier.height(20.dp))
-            LoginField(
+            TextField(
                 value = account.username,
-                onChange = { data -> account = account.copy(username = data) },
-                modifier = Modifier.width(300.dp)
+                onValueChange = { data -> account = account.copy(username = data) },
+                modifier = Modifier.width(300.dp),
+                label = "Username"
             )
-            PasswordField(
+            Spacer(Modifier.height(10.dp))
+            TextField(
                 value = account.password,
-                onChange = { data -> account = account.copy(password = data) },
-
-                modifier = Modifier.width(300.dp)
+                onValueChange = { data -> account = account.copy(password = data) },
+                modifier = Modifier.width(300.dp),
+                visualTransformation = PasswordVisualTransformation(),
+                label = "Password"
             )
             Spacer(Modifier.height(20.dp))
-            Button(modifier = Modifier.size(100.dp, 50.dp), onClick = {
+            Button(
+                text = stringResource(R.string.login_button_text),
+                modifier = Modifier.size(100.dp, 50.dp), onClick = {
                 viewModel.login(
                     accountLoginDto = AccountLoginDto(username = account.username, password = account.password)
                 ) { error, token ->
@@ -98,10 +107,7 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
                     }
                 }
             })
-            {
-                Text(stringResource(R.string.login_button_text));
-            }
-
+            Spacer(Modifier.height(5.dp))
             RegisterTextButton(onNavigateToRegister = { onNavigateToRegister() } )
 
             when (loginState) {
@@ -118,72 +124,3 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit, vi
     }
 }
 
-@Composable
-fun LoginField(
-    value: String,
-    onChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.username),
-) {
-
-    val focusManager = LocalFocusManager.current
-
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onChange,
-        modifier = modifier,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
-        ),
-        label = { Text(label) },
-        singleLine = true,
-        visualTransformation = VisualTransformation.None
-    )
-}
-
-@Composable
-fun PasswordField(
-    value: String,
-    onChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: String = "Password",
-) {
-
-    var isPasswordVisible by remember { mutableStateOf(false) }
-
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onChange,
-        modifier = modifier,
-
-        keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Password
-        ),
-
-        label = { Text(label) },
-        singleLine = true,
-        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
-    )
-}
-
-@SuppressLint("NewApi")
-@Composable
-fun RegisterTextButton(onNavigateToRegister: () -> Unit)
-{
-    Row(){
-        Text(
-            stringResource(R.string.no_account)
-        )
-        Text(
-            modifier = Modifier.clickable{
-                onNavigateToRegister()
-            },
-            text = stringResource(R.string.register_button_text),
-            color = colorResource(R.color.purple_secondary)
-        )
-    }
-}

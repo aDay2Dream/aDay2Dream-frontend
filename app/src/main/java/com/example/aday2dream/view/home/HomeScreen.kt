@@ -1,62 +1,39 @@
 package com.example.aday2dream.view.home
 
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import com.example.aday2dream.R
-import com.example.aday2dream.model.dto.PostDto
+import com.example.aday2dream.view.HomeBottomBar
+import com.example.aday2dream.view.PostItem
+import com.example.aday2dream.view.TopBar
 import com.example.aday2dream.viewmodel.post.PostViewModel
 
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> Unit, navigateToProfile: () -> Unit,  viewModel: PostViewModel) {
+fun HomeScreen(
+    navigateToPost: (postId: Long) -> Unit,
+    navigateToAddPost: () -> Unit,
+    navigateToProfile: () -> Unit,
+    viewModel: PostViewModel
+) {
     val posts by viewModel.posts.observeAsState(emptyList())
     val error by viewModel.error.observeAsState()
 
@@ -64,150 +41,47 @@ fun HomeScreen(navigateToPost: (postId: Long) -> Unit, navigateToAddPost: () -> 
         viewModel.fetchPosts()
     }
 
-    val scrollState = rememberScrollState()
-    Scaffold(modifier = Modifier.background(colorResource(R.color.pink_secondary)),
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.clip(
-                    RoundedCornerShape(20.dp)).border(width = 2.dp, color = colorResource(R.color.purple_main), shape = RoundedCornerShape(20.dp))
-                ,
-                colors = TopAppBarColors(
-                    containerColor = colorResource(R.color.pink_secondary),
-                    scrolledContainerColor = colorResource(R.color.pink_secondary),
-                    navigationIconContentColor = colorResource(R.color.pink_secondary),
-                    titleContentColor = colorResource(R.color.pink_secondary),
-                    actionIconContentColor = colorResource(R.color.pink_secondary)
-                ),
-                title = {}
-            )
-            Row(modifier = Modifier.fillMaxWidth().padding(50.dp), horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom){
-                Image(painter = painterResource(R.drawable.logo_name),
-                    contentDescription = stringResource(R.string.logo_content_description))
-
-            }
-
-        },
-
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier.height(120.dp)
-                    .clip(RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)).border(
-                        width = 2.dp, color = colorResource(
-                            R.color.purple_main
-                        ), shape = RoundedCornerShape(20.dp)
-                    ),
-                containerColor = colorResource(R.color.pink_secondary)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = { TopBar(
+            painter = painterResource(R.drawable.logo_name)
+        ) },
+        bottomBar = { HomeBottomBar(navigateToAddPost, navigateToProfile) },
+        containerColor = colorResource(R.color.pink_secondary)
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            if (posts.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "account",
-                            tint = colorResource(
-                                R.color.purple_main
-                            )
-                        )
-                    }
-                    FloatingActionButton(
-                        modifier = Modifier.clip(CircleShape)
-                            .background(colorResource(R.color.purple_main)),
-                        onClick = { navigateToAddPost() },
-                        containerColor = colorResource(R.color.purple_main),
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-                    ) {
-                        Icon(
-                            modifier = Modifier.clip(
-                                CircleShape
-                            ).background(colorResource(R.color.pink_secondary)),
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                    IconButton(onClick = {
-                        navigateToProfile()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "account",
-                            tint = colorResource(
-                                R.color.purple_main
-                            )
-                        )
-                    }
+                    Text(
+                        text = "No posts yet. Be the first to share!",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
-            }
-        }
-    )
-    { innerPadding ->
-        if (posts.isEmpty()) {
-            Text("There are no posts yet", modifier = Modifier.padding(16.dp))
-        } else {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                items(posts) { post ->
-                    Log.d("Home Page", "{$post}")
-                    PostItem(post, navigateToPost = navigateToPost)
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(posts) { post ->
+                        PostItem(post, navigateToPost)
+                    }
                 }
             }
         }
     }
 }
-    @Composable
-    fun PostItem(post: PostDto, navigateToPost: (postId: Long) -> Unit) {
-        Log.d("Post Item", "postId: {${post.postId}}")
-        Card(
-            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).padding(10.dp)
-                .height(120.dp).clickable {
-                    post.postId?.let { navigateToPost(it) } ?: Log.e("PostItem", "Post ID is null")
 
-                }) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            )
-            {
-                Column(
-                    modifier = Modifier.width(120.dp)
-                        .clip(RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp)),
-                    horizontalAlignment = AbsoluteAlignment.Left
-                )
-                {
-                    FloatingActionButton(
-                        modifier = Modifier.fillMaxHeight().width(80.dp)
-                            .clip(RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp)),
-                        onClick = {
 
-                        }
-                    ) {
-                        Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "play")
-                    }
-                }
-                Row()
-                {
-                    Column() {
-                        Text(post.title)
-                        Text(post.description)
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = AbsoluteAlignment.Right
-                    ) {
-                        Text(text = post.price.toString())
-                    }
-
-                }
-            }
-        }
-    }
 
 
 
