@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +34,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.colorResource
+import com.example.aday2dream.R
+import com.example.aday2dream.view.Button
+import com.example.aday2dream.view.TopBar
 import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.viewmodel.mail.MailViewModel
 
@@ -72,8 +76,8 @@ fun PromptScreen(promptId: Long, promptViewModel: PromptViewModel,
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Prompt Details") },
+            TopBar(
+                label = "Prompt Details",
                 navigationIcon = {
                     IconButton(onClick = { onNavigateBack() }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -81,12 +85,13 @@ fun PromptScreen(promptId: Long, promptViewModel: PromptViewModel,
                 }
             )
         },
+        containerColor = colorResource(R.color.pink_secondary),
         content = { paddingValues ->
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(Color.White)
+                    .background(colorResource(R.color.pink_secondary))
             ) {
                 prompt?.let {
                     Column(
@@ -100,21 +105,19 @@ fun PromptScreen(promptId: Long, promptViewModel: PromptViewModel,
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(text = "Start Date: ${it.startDate}")
                         Text(text = "End Date: ${it.endDate}")
-                    }
-                } ?: Text("Prompt not found", modifier = Modifier.align(Alignment.Center))
-                Column() {
-                    Button(
-                        onClick = { launcher.launch("audio/*") },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Select Audio File")
-                    }
 
-                    Log.d("Prompt Screen", "fileUri: $fileUri")
-                    Log.d("Prompt Screen", message)
-                    Log.d("Prompt Screen", "Account: ${account.toString()}")
-                    Button(
-                        onClick = {
+                        Button(
+                            text = "Select Audio File",
+                            onClick = { launcher.launch("audio/*") },
+                            modifier = Modifier.width(200.dp)
+                        )
+                        Log.d("Prompt Screen", "fileUri: $fileUri")
+                        Log.d("Prompt Screen", message)
+                        Log.d("Prompt Screen", "Account: ${account.toString()}")
+                        Button(
+                            text = "Send Audiofile",
+                            modifier = Modifier.width(200.dp),
+                            onClick = {
                                 account?.let {
                                     mailViewModel.sendEmail(
                                         context = context,
@@ -127,13 +130,13 @@ fun PromptScreen(promptId: Long, promptViewModel: PromptViewModel,
                                         },
                                         onError = { error ->
                                             Log.d("Mail Sending", error)
-                                        })
+                                        }
+                                    )
                                 }
-                        }
-                    ) {
-                        Text("Send Audiofile!")
+                            }
+                        )
                     }
-                }
+                } ?: Text("Prompt not found", color = colorResource(R.color.pink_secondary))
             }
         }
     )

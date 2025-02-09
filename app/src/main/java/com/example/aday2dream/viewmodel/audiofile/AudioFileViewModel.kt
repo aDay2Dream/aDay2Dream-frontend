@@ -42,31 +42,21 @@ class AudioFileViewModel(private val repository: AudioFileRepository) : ViewMode
                 file.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
                 }
-
-
                 val requestFile = file.asRequestBody("audio/mpeg".toMediaTypeOrNull())
                 val filePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-
                 val titlePart = title.toRequestBody("text/plain".toMediaTypeOrNull())
                 val durationPart = duration.toRequestBody("text/plain".toMediaTypeOrNull())
-                Log.d("Upload", titlePart.toString() )
-                Log.d(  "Upload", durationPart.toString() )
-                Log.d("Upload", filePart.toString())
 
                 val response = repository.uploadAudio(filePart, titlePart, durationPart)
                 if (response.isSuccessful) {
                     val uploadedAudioFile = response.body() ?: return@launch
                     _audiofile.postValue(uploadedAudioFile)
                     onSuccess(uploadedAudioFile)
-                    Log.d("Upload", "Success: $uploadedAudioFile")
                 } else {
-                    Log.d("Upload", response.toString())
-                    Log.e("Upload", "Failed: ${response.message()}")
                     onError(response.message() ?: "Unknown error")
                 }
             } catch (e: Exception) {
-                Log.e("Upload", "Error: ${e.localizedMessage}")
                 onError("Error occurred during upload")
             }
         }

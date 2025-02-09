@@ -65,7 +65,7 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
             dataStore.edit { preferences ->
                 preferences[stringPreferencesKey("auth_token")] = ""
             }
-            println("Auth Token saved")
+            println("Auth Token deleted")
         }
     }
 
@@ -153,6 +153,7 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
                 val profileData = repository.getProfile()
                 if (profileData != null) {
                     _profile.postValue(profileData)
+                    Log.d("AccountViewModel", "Profile fetched: $profileData")
                 }
             } catch (e: Exception) {
                 Log.e("AccountViewModel", "Error fetching profile: ${e.message}")
@@ -178,8 +179,7 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
                         lastName = lastName,
                         email = email,
                         username = username
-                    ),
-                    password = password
+                    )
                 )
                 _profile.postValue(updatedProfile)
                 onSuccess()
@@ -200,10 +200,10 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
         }
     }
 
-    fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit, accountId: Long) {
         viewModelScope.launch {
             try {
-                repository.deleteAccount()
+                repository.deleteAccount(accountId)
                 onSuccess()
             } catch (e: Exception) {
                 onError(e.localizedMessage ?: "Error deleting account")
@@ -213,8 +213,12 @@ class AccountViewModel(val repository: AccountRepository) : ViewModel() {
     fun logoutAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                repository.logoutAccount()
+                val response = repository.logoutAccount()
+                if (response != null) {
+                    Log.d("Logout", response)
+                }
                 deleteAuthToken()
+                _profile.postValue(null)
                 onSuccess()
             } catch (e: Exception) {
                 onError(e.localizedMessage ?: "Error deleting account")

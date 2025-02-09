@@ -46,13 +46,13 @@ interface ApiService {
         suspend fun getAccountById(@Header("Authorization") authHeader: String, @Path("id") accountId: Long): Response<AccountDto>
 
         @PUT(ACCOUNT_BY_ID)
-        suspend fun updateAccount(@Header("Authorization") authHeader: String, @Path("id") accountId: Long, @Body account: AccountDto, @Query("password") password: String): Response<AccountDto>
+        suspend fun updateAccount(@Header("Authorization") authHeader: String, @Path("id") accountId: Long, @Body account: AccountDto): Response<AccountDto>
 
         @DELETE(ACCOUNT_BY_ID)
-        suspend fun deleteAccount(@Header("Authorization") authHeader: String): Response<Unit>
+        suspend fun deleteAccount(@Header("Authorization") authHeader: String, @Path("id") accountId: Long): Response<Unit>
 
         @POST(LOG_OUT)
-        suspend fun logoutAccount(@Header("Authorization") authHeader: String): Response<Unit>
+        suspend fun logoutAccount(@Header("Authorization") authHeader: String): Response<String>
 
         @Multipart
         @POST(UPLOAD_AUDIOFILE)
@@ -76,7 +76,7 @@ interface ApiService {
         suspend fun getPostById(@Header("Authorization") authHeader: String, @Path("id") postId: Long): PostDto
 
         @GET(POSTS_BY_ACCOUNT)
-        suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<PostDto>>
+        suspend fun getPostsByAccount(@Header("Authorization") authHeader: String, @Path("publisherId") accountId: Long): Response<List<PostDto>>
 
         @PUT(UPDATE_POST)
         suspend fun updatePost(@Header("Authorization") authHeader: String, @Path("id") postId: Long, @Body updatedPost: PostDto): Response<PostDto>
@@ -87,13 +87,13 @@ interface ApiService {
         @GET(PROMPT_BY_ID)
         suspend fun getPromptById(@Header("Authorization") authHeader: String, @Path("id") promptId: Long): Response<PromptDto>
 
-        @GET(PROMPTS_BY_POST_ID)
+        @GET(PROMPTS_BY_ACCOUNT_ID)
         suspend fun getPromptsByAccountId(@Header("Authorization") authHeader: String, @Path("accountId") accountId: Long): Response<List<PromptDto>>
 
         @POST(CREATE_PROMPT)
         suspend fun createPrompt(@Header("Authorization") authHeader: String, @Body prompt: PromptDto): Response<PromptDto>
 
-        @GET(PROMPTS_BY_ACCOUNT_ID)
+        @GET(PROMPTS_BY_POST_ID)
         suspend fun getPromptsByPostId(@Header("Authorization") authHeader: String, @Path("postId") postId: Long): Response<List<PromptDto>>
 
         @Multipart

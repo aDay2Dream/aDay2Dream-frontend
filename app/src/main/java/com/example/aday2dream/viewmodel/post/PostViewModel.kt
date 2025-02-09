@@ -118,6 +118,7 @@ class PostViewModel(private val postRepository: PostRepository) : ViewModel() {
             try {
                 val accountPosts = postRepository.getPostsByAccountId(accountId)
                 _posts.postValue(accountPosts)
+                Log.d("Fetch Posts By Account", accountPosts.toString())
             } catch (e: Exception) {
                 _error.postValue(e.localizedMessage)
             }

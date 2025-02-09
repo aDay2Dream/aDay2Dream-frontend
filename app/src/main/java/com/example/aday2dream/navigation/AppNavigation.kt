@@ -1,6 +1,5 @@
 package com.example.aday2dream.navigation
 
-import AddPromptScreen
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -17,6 +16,7 @@ import com.example.aday2dream.view.login.RegisterScreen
 import com.example.aday2dream.view.post.AddPostScreen
 import com.example.aday2dream.view.post.EditPostScreen
 import com.example.aday2dream.view.post.PostScreen
+import com.example.aday2dream.view.prompt.AddPromptScreen
 import com.example.aday2dream.view.prompt.PromptScreen
 import com.example.aday2dream.view.prompt.ViewPromptScreen
 import com.example.aday2dream.viewmodel.account.AccountViewModel
@@ -26,38 +26,40 @@ import com.example.aday2dream.viewmodel.post.PostViewModel
 import com.example.aday2dream.viewmodel.prompt.PromptViewModel
 
 @Composable
-fun AppNavigation(navController: NavHostController, accountViewModel: AccountViewModel, postViewModel: PostViewModel, audioFileViewModel: AudioFileViewModel, promptViewModel: PromptViewModel, mailViewModel: MailViewModel) {
+fun AppNavigation(navController: NavHostController,
+                  accountViewModel: AccountViewModel,
+                  postViewModel: PostViewModel,
+                  audioFileViewModel: AudioFileViewModel,
+                  promptViewModel: PromptViewModel,
+                  mailViewModel: MailViewModel) {
     NavHost(
         navController = navController,
-        startDestination = com.example.aday2dream.navigation.Screen.Login.route
+        startDestination = Screen.Login.route
     ) {
 
-        composable(com.example.aday2dream.navigation.Screen.Login.route) {
+        composable(Screen.Login.route) {
             LoginScreen(
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route)
                 },
                 viewModel = accountViewModel
-
             )
         }
 
-        composable(com.example.aday2dream.navigation.Screen.Register.route) {
+        composable(Screen.Register.route) {
             RegisterScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onRegisterSuccess = {
                     navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Register.route) {
-                            inclusive = true
-                        }
+                        popUpTo(Screen.Register.route)
                     }
                 },
                 viewModel = accountViewModel
             )
         }
 
-        composable(com.example.aday2dream.navigation.Screen.Home.route) {
+        composable(Screen.Home.route) {
             HomeScreen(
                 navigateToPost = { postId ->
                     navController.navigate(
@@ -72,7 +74,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             )
         }
 
-        composable(com.example.aday2dream.navigation.Screen.AddPost.route) {
+        composable(Screen.AddPost.route) {
             AddPostScreen(
                 onPostCreated = { navController.popBackStack() },
                 audioFileViewModel = audioFileViewModel,
@@ -80,7 +82,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 postViewModel = postViewModel
             )
         }
-        composable(route = com.example.aday2dream.navigation.Screen.Post.route,
+        composable(route = Screen.Post.route,
             arguments = listOf(navArgument("postId") { type = NavType.LongType })
         ) { backStackEntry ->
                 val postId = backStackEntry.arguments?.getLong("postId")
@@ -98,17 +100,17 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 }
             }
 
-        composable(com.example.aday2dream.navigation.Screen.Profile.route) {
+        composable(Screen.Profile.route) {
             AccountScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateLogin = { navController.navigate(com.example.aday2dream.navigation.Screen.Login.route) },
-                onEditInfo = { navController.navigate(com.example.aday2dream.navigation.Screen.EditAccount.route) },
+                onNavigateLogin = {  navController.navigate(Screen.Login.route) },
+                onEditInfo = { navController.navigate(Screen.EditAccount.route) },
                 accountViewModel = accountViewModel,
                 postViewModel = postViewModel,
                 onEditPost = {
                         postId ->
                     navController.navigate(
-                        com.example.aday2dream.navigation.Screen.EditPost.createRoute(
+                        Screen.EditPost.createRoute(
                             postId
                         )
                     )
@@ -116,7 +118,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 onViewPrompt = {
                         promptId ->
                     navController.navigate(
-                        com.example.aday2dream.navigation.Screen.ViewPrompt.createRoute(
+                        Screen.ViewPrompt.createRoute(
                             promptId
                         )
                     )
@@ -124,7 +126,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 promptViewModel = promptViewModel
             )
         }
-        composable(com.example.aday2dream.navigation.Screen.EditAccount.route) {
+        composable(Screen.EditAccount.route) {
             EditAccountScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateLogin = {
@@ -136,7 +138,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             )
         }
 
-        composable(route = com.example.aday2dream.navigation.Screen.EditPost.route,
+        composable(route = Screen.EditPost.route,
             arguments = listOf(navArgument("postId") { type = NavType.LongType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getLong("postId")
@@ -152,7 +154,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             }
         }
 
-        composable(route = com.example.aday2dream.navigation.Screen.AddPrompt.route,
+        composable(route = Screen.AddPrompt.route,
             arguments = listOf(navArgument("postId") { type = NavType.LongType })
             ) {
                 backStackEntry ->
@@ -167,7 +169,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
                 )
             }
         }
-        composable(route = com.example.aday2dream.navigation.Screen.ViewPrompt.route,
+        composable(route = Screen.ViewPrompt.route,
             arguments = listOf(navArgument("postId") { type = NavType.LongType })) { backStackEntry ->
             val postId = backStackEntry.arguments?.getLong("postId")
 
@@ -180,7 +182,7 @@ fun AppNavigation(navController: NavHostController, accountViewModel: AccountVie
             }
         }
 
-        composable(route = com.example.aday2dream.navigation.Screen.Prompt.route,
+        composable(route = Screen.Prompt.route,
                 arguments = listOf(navArgument("promptId") { type = NavType.LongType })) { backStackEntry ->
                     val promptId = backStackEntry.arguments?.getLong("promptId")
 

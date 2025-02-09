@@ -9,18 +9,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
@@ -32,17 +28,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.R
 import com.example.aday2dream.model.dto.AccountDto
+import com.example.aday2dream.view.TextField
+import com.example.aday2dream.view.Button
+import com.example.aday2dream.view.TopBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,28 +54,15 @@ fun RegisterScreen(onNavigateBack: () -> Unit, onRegisterSuccess: () -> Unit, vi
     Scaffold(snackbarHost = {
         SnackbarHost(hostState = snackbarHostState)
     },
+        containerColor = colorResource(R.color.pink_secondary),
         topBar = {
-        TopAppBar(
-            modifier = Modifier.clip(
-                RoundedCornerShape(20.dp)).border(width = 2.dp, color = colorResource(R.color.purple_main), shape = RoundedCornerShape(20.dp))
-            ,
-            colors = TopAppBarColors(
-                containerColor = colorResource(R.color.pink_secondary),
-                scrolledContainerColor = colorResource(R.color.pink_secondary),
-                navigationIconContentColor = colorResource(R.color.pink_secondary),
-                titleContentColor = colorResource(R.color.pink_secondary),
-                actionIconContentColor = colorResource(R.color.pink_secondary)
-            ),
-            title = {}
-        )
-        Row(modifier = Modifier.fillMaxWidth().padding(50.dp), horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom){
-            Image(painter = painterResource(R.drawable.logo_name),
-                contentDescription = stringResource(R.string.logo_content_description))
-
+            TopBar(
+                painter = painterResource(R.drawable.logo_name)
+            )
         }
 
-    }) { innerPadding ->
+
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -89,39 +72,47 @@ fun RegisterScreen(onNavigateBack: () -> Unit, onRegisterSuccess: () -> Unit, vi
         ) {
             Row()
             {
-                NameField(
+                TextField(
                     value = account.firstName,
-                    onChange = { data -> account = account.copy(firstName = data) },
+                    onValueChange = { data -> account = account.copy(firstName = data) },
                     modifier = Modifier.width(150.dp),
                     label = "First Name"
                 )
-                NameField(
+                Spacer(Modifier.width(10.dp))
+                TextField(
                     value = account.lastName,
-                    onChange = { data -> account = account.copy(lastName = data) },
+                    onValueChange = { data -> account = account.copy(lastName = data) },
                     modifier = Modifier.width(150.dp),
                     label = "Last Name"
 
                 )
             }
-            NameField(
+            Spacer(Modifier.height(10.dp))
+            TextField(
                 value = account.email,
-                onChange = { data -> account = account.copy(email = data) },
-                modifier = Modifier.width(150.dp),
+                onValueChange = { data -> account = account.copy(email = data) },
+                modifier = Modifier.width(310.dp),
                 label = "E-mail"
             )
-
-            LoginField(
+            Spacer(Modifier.height(10.dp))
+            TextField(
                 value = account.username,
-                onChange = { data -> account = account.copy(username = data) },
-                modifier = Modifier.width(150.dp)
+                onValueChange = { data -> account = account.copy(username = data) },
+                modifier = Modifier.width(310.dp),
+                label = "Username"
             )
-            PasswordField(
+            Spacer(Modifier.height(10.dp))
+            TextField(
                 value = account.password,
-                onChange = {data -> account = account.copy(password = data)},
-                modifier = Modifier.width(150.dp)
+                onValueChange = {data -> account = account.copy(password = data)},
+                modifier = Modifier.width(310.dp),
+                visualTransformation = PasswordVisualTransformation(),
+                label = "Password"
             )
-
+            Spacer(Modifier.height(20.dp))
             Button(
+                text = stringResource(R.string.register_button_text),
+                modifier = Modifier.width(150.dp),
                 onClick = {
                     viewModel.register(
                         username = account.username,
@@ -133,73 +124,10 @@ fun RegisterScreen(onNavigateBack: () -> Unit, onRegisterSuccess: () -> Unit, vi
                         error?.let { Log.e("Registration", it) }
                     }
                     onRegisterSuccess()
-                })
-             {
-                Text(stringResource(R.string.register_button_text));
-            }
+                }
+            )
         }
     }
-}
-
-@Composable
-fun TextFieldFirstName()
-{
-    var firstName by remember { mutableStateOf("") }
-
-
-}
-
-@Composable
-fun TextFieldEmail()
-{
-    var email by remember { mutableStateOf("") }
-
-    Spacer(modifier = Modifier.width(10.dp))
-    OutlinedTextField(
-        modifier = Modifier.clip(RoundedCornerShape(15.dp)),
-        value = email,
-        onValueChange = { email = it },
-        label = { Text("E-mail") }
-    )
-}
-
-
-@Composable
-fun TextFieldLastName()
-{
-    var lastName by remember { mutableStateOf("") }
-
-    OutlinedTextField(
-        modifier = Modifier.clip(RoundedCornerShape(15.dp)).width(142.dp),
-        value = lastName,
-        onValueChange = { lastName = it },
-        label = { Text("Last Name") }
-    )
-}
-
-@Composable
-fun NameField(
-    value: String,
-    onChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: String,
-) {
-
-    val focusManager = LocalFocusManager.current
-
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onChange,
-        modifier = modifier,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
-        ),
-        label = { Text(label) },
-        singleLine = true,
-        visualTransformation = VisualTransformation.None
-    )
 }
 
 

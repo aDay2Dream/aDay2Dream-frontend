@@ -10,9 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
+
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,7 +39,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.colorResource
+import com.example.aday2dream.R
 import com.example.aday2dream.model.dto.AudioFileDto
+import com.example.aday2dream.view.Button
+import com.example.aday2dream.view.TopBar
 import com.example.aday2dream.viewmodel.account.AccountViewModel
 import com.example.aday2dream.viewmodel.audiofile.AudioFileViewModel
 
@@ -73,9 +78,10 @@ fun PostScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        containerColor = colorResource(R.color.pink_secondary),
         topBar = {
-            TopAppBar(
-                title = { Text("Post Details") },
+            TopBar(
+                label = "Post Details",
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -95,48 +101,42 @@ fun PostScreen(
                 Text(
                     text = post.title,
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = colorResource(R.color.purple_main)
                 )
                 Text(
                     text = "By: ${account!!.username}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = colorResource(R.color.purple_main)
                 )
                 Text(
                     text = post.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = colorResource(R.color.purple_main)
                 )
                 Text(
                     text = "Price: $${post.price}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = colorResource(R.color.purple_main)
                 )
                 if (audioFile != null) {
                     Text(
                         text = "Audio: ${audioFile!!.title}",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        color = colorResource(R.color.purple_main)
                     )
-                    Button(
-                        onClick = {
-                            playAudio(context, audioFile!!.uri)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Play Audio")
-                    }
                 }
                 Button(
+                    text = "Add Prompt",
                     onClick = {
                         navController.navigate("addPrompt/${post.postId}")
                     },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Create Prompt")
-                }
+                    modifier = Modifier.width(150.dp)
+                )
             }
         } else {
             Box(
@@ -146,17 +146,5 @@ fun PostScreen(
                 CircularProgressIndicator()
             }
         }
-    }
-}
-
-private fun playAudio(context: Context, audioUri: String) {
-    try {
-        val mediaPlayer = MediaPlayer().apply {
-            setDataSource(context, Uri.parse(audioUri))
-            prepare()
-            start()
-        }
-    } catch (e: Exception) {
-        Log.e("PostScreen", "Error playing audio: ${e.localizedMessage}")
     }
 }

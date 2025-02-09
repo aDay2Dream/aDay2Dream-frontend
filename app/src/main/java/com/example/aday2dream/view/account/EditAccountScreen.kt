@@ -7,8 +7,13 @@ import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +22,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aday2dream.R
+import com.example.aday2dream.view.Button
+import com.example.aday2dream.view.TextField
+import com.example.aday2dream.view.TopBar
 import com.example.aday2dream.viewmodel.account.AccountViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,64 +45,62 @@ fun EditAccountScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(R.color.pink_secondary)),
-        topBar = {
-            TopAppBar(
-                title = { Text("Edit Profile") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(R.color.purple_main)
-                )
-            )
-        },
+        containerColor = colorResource(R.color.pink_secondary),
+        topBar =
+        {
+            TopBar(
+                label = "Edit Profile",
+                navigationIcon = {
+                    IconButton(onClick = { onNavigateBack() }) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colorResource(R.color.purple_main))
+                    }
+            })
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = "Update your profile information:",
-                style = TextStyle(fontSize = 18.sp, color = Color.Black)
+                style = TextStyle(fontSize = 18.sp),
+                color = colorResource(R.color.purple_main)
             )
 
-            BasicTextField(
+            TextField(
                 value = firstName,
                 onValueChange = { firstName = it },
-                textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White, shape = MaterialTheme.shapes.small)
                     .padding(8.dp)
             )
 
-            BasicTextField(
+            TextField(
                 value = lastName,
                 onValueChange = { lastName = it },
-                textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White, shape = MaterialTheme.shapes.small)
                     .padding(8.dp)
             )
 
-            BasicTextField(
+            TextField(
                 value = email,
                 onValueChange = { email = it },
-                textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White, shape = MaterialTheme.shapes.small)
                     .padding(8.dp)
             )
 
-            BasicTextField(
+            TextField(
                 value = username,
                 onValueChange = { username = it },
-                textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White, shape = MaterialTheme.shapes.small)
                     .padding(8.dp)
             )
 
@@ -121,29 +127,29 @@ fun EditAccountScreen(
                         }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.purple_main)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Save Changes")
-            }
+                modifier = Modifier.fillMaxWidth(),
+                text = "Save Changes"
+            )
+
 
             Button(
+                text = "Delete Account",
                 onClick = {
-                    accountViewModel.deleteAccount(
-                        onSuccess = {
-                            Toast.makeText(context, "Account deleted successfully!", Toast.LENGTH_LONG).show()
-                            onNavigateLogin()
-                        },
-                        onError = {
-                            Toast.makeText(context, "Error deleting account: $it", Toast.LENGTH_LONG).show()
-                        }
-                    )
+                    profile?.accountId?.let {
+                        accountViewModel.deleteAccount(
+                            accountId = it,
+                            onSuccess = {
+                                Toast.makeText(context, "Account deleted successfully!", Toast.LENGTH_LONG).show()
+                                onNavigateLogin()
+                            },
+                            onError = {
+                                Toast.makeText(context, "Error deleting account: $it", Toast.LENGTH_LONG).show()
+                            }
+                        )
+                    }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Delete Account")
-            }
+            )
         }
     }
 }

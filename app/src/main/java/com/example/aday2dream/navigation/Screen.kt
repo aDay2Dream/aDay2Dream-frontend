@@ -30,5 +30,4 @@ sealed class Screen(val route: String) {
     {
         fun createRoute(postId: Long) = "viewPrompt/$postId"
     }
-
 }

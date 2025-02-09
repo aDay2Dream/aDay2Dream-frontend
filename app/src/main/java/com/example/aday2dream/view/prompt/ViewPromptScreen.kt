@@ -1,5 +1,6 @@
 package com.example.aday2dream.view.prompt
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,13 +22,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+
 import androidx.navigation.NavController
 import com.example.aday2dream.viewmodel.prompt.PromptViewModel
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.graphics.Color
-import com.example.aday2dream.model.dto.PromptDto
+import androidx.compose.ui.res.colorResource
+import com.example.aday2dream.R
+import com.example.aday2dream.view.TopBar
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,8 +46,8 @@ fun ViewPromptScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Prompts") },
+            TopBar(
+                label = "Prompts",
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -56,35 +58,21 @@ fun ViewPromptScreen(
     ) { paddingValues ->
         if (prompts?.isEmpty() == true) {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize().background(color = colorResource(R.color.pink_secondary)),
+                contentAlignment = Alignment.Center,
+
             ) {
                 Text("No prompts available")
             }
         } else {
-            LazyColumn(modifier = Modifier.padding(paddingValues)) {
+            LazyColumn(modifier = Modifier.padding(paddingValues).background(color = colorResource(R.color.pink_secondary)), ) {
                 items(prompts ?: emptyList()) { prompt ->
-                    com.example.aday2dream.view.account.PromptItem(prompt) { promptId ->
+                    com.example.aday2dream.view.PromptItem(prompt) { promptId ->
                         navController.navigate("prompt/$promptId")
                     }
                 }
 
             }
-        }
-    }
-}
-
-@Composable
-fun PromptItem(prompt: PromptDto, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() },
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = prompt.promptTitle)
-            Text(text = prompt.promptDescription, color = Color.Gray)
         }
     }
 }
